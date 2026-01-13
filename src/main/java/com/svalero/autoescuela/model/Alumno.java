@@ -1,4 +1,5 @@
 package com.svalero.autoescuela.model;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,16 +10,30 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 
+@Entity (name = "alumnos")
+@Table(name = "alumnos")
 public class Alumno {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column
     private String nombre;
+    @Column
     private String apellidos;
+    @Column
     private String dni;
-    private LocalDate fecha_nacimiento;
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+    @Column
     private String telefono;
+    @Column
     private String email;
+    @Column
     private String direccion;
-    private boolean usa_gafas;
-    private float nota_teorico;
-    private int autoescuela_id;
+    @Column(name = "usa_gafas")
+    private boolean usaGafas;
+    @Column(name = "nota_teorico")
+    private float notaTeorico;
+    @Column(name = "autoescuela_id")
+    private int autoescuelaId;
 }
