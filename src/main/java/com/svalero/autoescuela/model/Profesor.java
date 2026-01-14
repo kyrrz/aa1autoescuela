@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,6 +33,8 @@ public class Profesor {
     private String especialidad;
     @Column
     private boolean activo;
-    @Column(name = "autoescuela_id")
-    private int autoescuelaId;
+
+
+    @ManyToMany(mappedBy = "profesores")
+    private List<Autoescuela> autoescuelas;
 }

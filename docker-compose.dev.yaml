@@ -12,4 +12,4 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - C:\Users\kyrrz\data_aa1:/var/lib/mysql
+      - C:\Users\kyrrz\data_aa1_autoescuela:/var/lib/mysql

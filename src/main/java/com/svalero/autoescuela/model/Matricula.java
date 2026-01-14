@@ -17,8 +17,8 @@ public class Matricula {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "alumno_id")
-    private int alumnoId;
+    @Column
+    private String modalidad;
     @Column(name = "tipo_matricula")
     private String tipoMatricula;
     @Column(name = "fecha_inicio")
@@ -35,4 +35,12 @@ public class Matricula {
     private boolean completada;
     @Column
     private String observaciones;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "alumno_id")
+    private Alumno alumno;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "autoescuela_id")
+    private Autoescuela autoescuela;
 }

@@ -1,10 +1,12 @@
 package com.svalero.autoescuela.controller;
 
+import com.svalero.autoescuela.exception.AlumnoNotFoundException;
+import com.svalero.autoescuela.exception.ErrorResponse;
+import com.svalero.autoescuela.exception.MatriculaNotFoundException;
 import com.svalero.autoescuela.model.Matricula;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,5 +20,11 @@ public class MatriculaController {
     @PostMapping("/matricula")
     public void addMatricula(@RequestBody Matricula matricula){
 
+    }
+
+    @ExceptionHandler(MatriculaNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleException(MatriculaNotFoundException anfe){
+        ErrorResponse errorResponse = new ErrorResponse(404, "not-found", "Matricula no encontrada");
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }
