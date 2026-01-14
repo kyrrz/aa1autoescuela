@@ -32,6 +32,10 @@ public class Coche {
     private float precioCompra;
     @Column
     private boolean disponible;
-    @Column(name = "autoescuela_id")
-    private int autoescuelaId;
+
+
+    @ManyToOne
+    @JoinColumn(name = "autoescuela_id")
+    private Autoescuela autoescuela;
+
 }

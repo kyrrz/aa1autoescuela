@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -30,10 +31,17 @@ public class Alumno {
     private String email;
     @Column
     private String direccion;
+    @Column
+    private String ciudad;
     @Column(name = "usa_gafas")
     private boolean usaGafas;
     @Column(name = "nota_teorico")
     private float notaTeorico;
-    @Column(name = "autoescuela_id")
-    private int autoescuelaId;
+
+    @OneToMany(mappedBy = "alumno")
+    private List<Matricula> matriculas;
+
+    @ManyToOne
+    @JoinColumn(name = "autoescuela_id")
+    private Autoescuela autoescuela;
 }
