@@ -1,6 +1,7 @@
 package com.svalero.autoescuela.repository;
 
 import com.svalero.autoescuela.model.Profesor;
+import org.hibernate.query.sqm.mutation.internal.temptable.LocalTemporaryTableInsertStrategy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +11,12 @@ import java.util.List;
 public interface ProfesorRepository extends CrudRepository<Profesor, Long> {
     List<Profesor> findAll();
     List<Profesor> findByEspecialidad(String especialidad);
+    List<Profesor> findByNombre(String nombre);
+    List<Profesor> findByActivo(Boolean activo);
+
+    List<Profesor> findByNombreAndEspecialidad(String nombre, String especialidad);
+    List<Profesor> findByNombreAndActivo(String nombre, Boolean activo);
+    List<Profesor> findByActivoAndEspecialidad(Boolean activo, String especialidad);
+
+    List<Profesor> findByNombreAndEspecialidadAndActivo(String nombre, String especialidad, Boolean activo);
 }

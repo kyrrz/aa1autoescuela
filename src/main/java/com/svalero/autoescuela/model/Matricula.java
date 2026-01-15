@@ -37,10 +37,11 @@ public class Matricula {
     private String observaciones;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "alumno_id")
     private Alumno alumno;
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne
     @JoinColumn(name = "autoescuela_id")
     private Autoescuela autoescuela;
 }
