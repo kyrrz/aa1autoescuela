@@ -15,6 +15,5 @@ public class AlumnoOutDto {
     private String dni;
     private String ciudad;
     private float notaTeorico;
-    private long matriculaId;
-    private long autoescuelaId;
+
 }

@@ -1,16 +1,24 @@
 package com.svalero.autoescuela.service;
 
 
+import com.svalero.autoescuela.dto.AutoescuelaDetailOutDto;
+import com.svalero.autoescuela.dto.CocheDetailOutDto;
 import com.svalero.autoescuela.dto.CocheInDto;
+import com.svalero.autoescuela.dto.CocheOutDto;
+import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.exception.CocheNotFoundException;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.model.Coche;
+import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.CocheRepository;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,8 +28,10 @@ public class CocheService {
     private CocheRepository cocheRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private AutoescuelaRepository autoescuelaRepository;
 
-    public Coche add(CocheInDto cocheInDto, Autoescuela  autoescuela){
+    public CocheDetailOutDto add(CocheInDto cocheInDto, AutoescuelaDetailOutDto autoescuelaDetailOutDto) throws AutoescuelaNotFoundException {
         Coche coche = new Coche();
         modelMapper.map(cocheInDto, coche);
 //        coche.setMatricula(cocheInDto.getMatricula());
@@ -32,12 +42,58 @@ public class CocheService {
 //        coche.setFechaCompra(cocheInDto.getFechaCompra());
 //        coche.setPrecioCompra(cocheInDto.getPrecioCompra());
 //        coche.setDisponible(cocheInDto.getDisponible());
+        Autoescuela autoescuela = autoescuelaRepository.findById(autoescuelaDetailOutDto.getId())
+                .orElseThrow(AutoescuelaNotFoundException::new);
         coche.setAutoescuela(autoescuela);
 
-        return cocheRepository.save(coche);
+        Coche savedCoche = cocheRepository.save(coche);
+        return modelMapper.map(savedCoche, CocheDetailOutDto.class);
     }
-    public List<Coche> findByMarca(String marca){
-        return cocheRepository.findByMarca(marca);
+
+
+    public List<CocheOutDto> findByFiltros(String marca, String modelo, String tipoCambio){
+
+        if (marca != null && modelo != null && tipoCambio != null) {
+            List<Coche> coches = cocheRepository.findByMarcaAndModeloAndTipoCambio(marca, modelo, tipoCambio);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+
+        if (modelo != null && tipoCambio != null) {
+            List<Coche> coches = cocheRepository.findByModeloAndTipoCambio(modelo, tipoCambio);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+        if (marca != null && tipoCambio != null) {
+            List<Coche> coches = cocheRepository.findByMarcaAndTipoCambio(marca, tipoCambio);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+        if (modelo != null && marca != null) {
+            List<Coche> coches = cocheRepository.findByMarcaAndModelo(marca, modelo);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+
+        if (tipoCambio != null) {
+            List<Coche> coches = cocheRepository.findByTipoCambio(tipoCambio);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+        if (modelo != null) {
+            List<Coche> coches = cocheRepository.findByModelo(modelo);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+        if (marca != null) {
+            List<Coche> coches = cocheRepository.findByMarca(marca);
+            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+            return cocheOutDtos;
+        }
+
+        List<Coche>  coches = cocheRepository.findAll();
+        List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+        return cocheOutDtos;
     }
 
     public void delete( long id ) throws CocheNotFoundException {
@@ -50,12 +106,12 @@ public class CocheService {
         return cocheRepository.findAll();
     }
 
-    public Coche findById(long id) throws CocheNotFoundException{
-        return cocheRepository.findById(id)
+    public CocheDetailOutDto findById(long id) throws CocheNotFoundException{
+        return cocheRepository.findById(id).map(coche -> modelMapper.map(coche, CocheDetailOutDto.class))
                 .orElseThrow(CocheNotFoundException::new);
     }
 
-    public Coche modify(long id, CocheInDto cocheInDto, Autoescuela autoescuela) throws CocheNotFoundException {
+    public CocheDetailOutDto modify(long id, CocheInDto cocheInDto, AutoescuelaDetailOutDto autoescuelaDetailOutDto) throws AutoescuelaNotFoundException, CocheNotFoundException {
         Coche coche = cocheRepository.findById(id)
                 .orElseThrow(CocheNotFoundException::new);
 
@@ -68,10 +124,13 @@ public class CocheService {
 //        coche.setFechaCompra(cocheInDto.getFechaCompra());
 //        coche.setPrecioCompra(cocheInDto.getPrecioCompra());
 //        coche.setDisponible(cocheInDto.getDisponible());
+        Autoescuela autoescuela = autoescuelaRepository.findById(autoescuelaDetailOutDto.getId()).orElseThrow(AutoescuelaNotFoundException::new);
         coche.setAutoescuela(autoescuela);
         coche.setId(id);
 
-        return cocheRepository.save(coche);
+        Coche savedCoche = cocheRepository.save(coche);
+
+        return modelMapper.map(savedCoche, CocheDetailOutDto.class);
     }
 
     }

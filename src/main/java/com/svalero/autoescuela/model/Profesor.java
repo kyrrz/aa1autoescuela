@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -35,6 +36,11 @@ public class Profesor {
     private boolean activo;
 
 
-    @ManyToMany(mappedBy = "profesores")
-    private List<Autoescuela> autoescuelas;
+    @ManyToMany
+    @JoinTable(
+            name = "profesores_autoescuela",
+            joinColumns = @JoinColumn(name = "profesor_id"),
+            inverseJoinColumns = @JoinColumn(name = "autoescuela_id")
+    )
+    private List<Autoescuela> autoescuelas = new ArrayList<>();
 }

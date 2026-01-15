@@ -1,13 +1,17 @@
 package com.svalero.autoescuela.service;
 
+import com.svalero.autoescuela.dto.AlumnoDetailOutDto;
 import com.svalero.autoescuela.dto.AlumnoInDto;
-import com.svalero.autoescuela.dto.AutoescuelaOutDto;
+import com.svalero.autoescuela.dto.AlumnoOutDto;
+import com.svalero.autoescuela.dto.AutoescuelaDetailOutDto;
 import com.svalero.autoescuela.exception.AlumnoNotFoundException;
+import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.model.Alumno;
 import com.svalero.autoescuela.model.Autoescuela;
-import com.svalero.autoescuela.model.Matricula;
 import com.svalero.autoescuela.repository.AlumnoRepository;
+import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +24,12 @@ public class AlumnoService {
     private AlumnoRepository alumnoRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private AutoescuelaRepository autoescuelaRepository;
 
 
-    public Alumno add(AlumnoInDto alumnoInDto, Autoescuela autoescuela){
-        Alumno a = new Alumno();
-        modelMapper.map(alumnoInDto, a);
+    public AlumnoDetailOutDto add(AlumnoInDto alumnoInDto, AutoescuelaDetailOutDto autoescuelaDetailOutDto) throws AutoescuelaNotFoundException {
+        Alumno alumno = modelMapper.map(alumnoInDto, Alumno.class);
 //        a.setNombre(alumnoInDto.getNombre());
 //        a.setApellidos(alumnoInDto.getApellidos());
 //        a.setDni(alumnoInDto.getDni());
@@ -34,9 +39,13 @@ public class AlumnoService {
 //        a.setDireccion(alumnoInDto.getDireccion());
 //        a.setUsaGafas(a.isUsaGafas());
 //        a.setNotaTeorico(alumnoInDto.getNotaTeorico());
-        a.setAutoescuela(autoescuela);
+        Autoescuela autoescuela = autoescuelaRepository.findById(autoescuelaDetailOutDto.getId())
+                .orElseThrow(AutoescuelaNotFoundException::new);
 
-        return alumnoRepository.save(a);
+        alumno.setAutoescuela(autoescuela);
+
+        Alumno a = alumnoRepository.save(alumno);
+        return modelMapper.map(a, AlumnoDetailOutDto.class);
     }
 
     public void delete( long id ) throws AlumnoNotFoundException {
@@ -45,112 +54,132 @@ public class AlumnoService {
         alumnoRepository.delete(a);
     }
 
-    public List<Alumno> findAll(){
-        return alumnoRepository.findAll();
+    public List<AlumnoOutDto> findAll(){
+
+        List<Alumno> alumnoList = alumnoRepository.findAll();
+        List<AlumnoOutDto> all =  modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+
+        return all;
     }
 
-    public List<Alumno> findByGafas(Boolean g){
-        return alumnoRepository.findByUsaGafas(g);
-    }
 
-    public List<Alumno> findByCiudad(String ciudad){
-        return alumnoRepository.findByCiudad(ciudad);
-    }
-
-    public List<Alumno> findByFiltros(String nombre, String ciudad, Boolean usaGafas, Float notaTeorico){
-        // 4 filtros
+    public List<AlumnoOutDto> findByFiltros(String nombre, String ciudad, Boolean usaGafas, Float notaTeorico){
         if (nombre != null && ciudad != null && usaGafas != null && notaTeorico != null) {
-            return alumnoRepository.findByNombreAndCiudadAndUsaGafasAndNotaTeorico(
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndCiudadAndUsaGafasAndNotaTeorico(
                     nombre, ciudad, usaGafas, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if( nombre != null && ciudad != null && usaGafas != null ){
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndCiudadAndUsaGafas(nombre, ciudad, usaGafas);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if( nombre != null && ciudad != null && notaTeorico != null ){
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndCiudadAndNotaTeorico(nombre, ciudad, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if( nombre != null && usaGafas != null && notaTeorico != null ){
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndUsaGafasAndNotaTeorico(nombre,  usaGafas, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if ( ciudad != null && usaGafas != null && notaTeorico != null ){
+            List<Alumno> alumnoList = alumnoRepository.findByCiudadAndUsaGafasAndNotaTeorico(ciudad, usaGafas, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
         }
 
-        // 3 filtros
-        if (nombre != null && ciudad != null && usaGafas != null) {
-            return alumnoRepository.findByNombreAndCiudadAndUsaGafas(nombre, ciudad, usaGafas);
+        if(ciudad != null && usaGafas != null){
+            List<Alumno> alumnoList = alumnoRepository.findByCiudadAndUsaGafas(ciudad, usaGafas);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(ciudad != null && notaTeorico != null){
+            List<Alumno> alumnoList = alumnoRepository.findByCiudadAndNotaTeorico(ciudad, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(usaGafas != null && notaTeorico != null){
+            List<Alumno> alumnoList = alumnoRepository.findByUsaGafasAndNotaTeorico(usaGafas, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(nombre != null && notaTeorico != null){
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndNotaTeorico(nombre, notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(nombre != null && usaGafas != null){
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndUsaGafas(nombre, usaGafas);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(nombre != null && ciudad != null){
+            List<Alumno> alumnoList = alumnoRepository.findByNombreAndCiudad(nombre, ciudad);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
         }
 
-        if (nombre != null && ciudad != null && notaTeorico != null) {
-            return alumnoRepository.findByNombreAndCiudadAndNotaTeorico(nombre, ciudad, notaTeorico);
+        if(nombre != null){
+            List<Alumno> alumnoList = alumnoRepository.findByNombre(nombre);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(ciudad != null){
+            List<Alumno> alumnoList = alumnoRepository.findByCiudad(ciudad);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(usaGafas != null){
+            List<Alumno> alumnoList = alumnoRepository.findByUsaGafas(usaGafas);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
+        }
+        if(notaTeorico != null){
+            List<Alumno> alumnoList = alumnoRepository.findByNotaTeorico(notaTeorico);
+            List<AlumnoOutDto> aod = modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
+            return aod;
         }
 
-        if (nombre != null && usaGafas != null && notaTeorico != null) {
-            return alumnoRepository.findByNombreAndUsaGafasAndNotaTeorico(nombre, usaGafas, notaTeorico);
-        }
 
-        if (ciudad != null && usaGafas != null && notaTeorico != null) {
-            return alumnoRepository.findByCiudadAndUsaGafasAndNotaTeorico(ciudad, usaGafas, notaTeorico);
-        }
+        List<Alumno> alumnoList = alumnoRepository.findAll();
+        List<AlumnoOutDto> all =  modelMapper.map(alumnoList, new TypeToken<List<AlumnoOutDto>>() {}.getType());
 
-        // 2 filtros
-        if (nombre != null && ciudad != null) {
-            return alumnoRepository.findByNombreAndCiudad(nombre, ciudad);
-        }
-
-        if (nombre != null && usaGafas != null) {
-            return alumnoRepository.findByNombreAndUsaGafas(nombre, usaGafas);
-        }
-
-        if (nombre != null && notaTeorico != null) {
-            return alumnoRepository.findByNombreAndNotaTeorico(nombre, notaTeorico);
-        }
-
-        if (ciudad != null && usaGafas != null) {
-            return alumnoRepository.findByCiudadAndUsaGafas(ciudad, usaGafas);
-        }
-
-        if (ciudad != null && notaTeorico != null) {
-            return alumnoRepository.findByCiudadAndNotaTeorico(ciudad, notaTeorico);
-        }
-
-        if (usaGafas != null && notaTeorico != null) {
-            return alumnoRepository.findByUsaGafasAndNotaTeorico(usaGafas, notaTeorico);
-        }
-
-        // 1 filtro
-        if (nombre != null) {
-            return alumnoRepository.findByNombre(nombre);
-        }
-
-        if (ciudad != null) {
-            return alumnoRepository.findByCiudad(ciudad);
-        }
-
-        if (usaGafas != null) {
-            return alumnoRepository.findByUsaGafas(usaGafas);
-        }
-
-        if (notaTeorico != null) {
-            return alumnoRepository.findByNotaTeorico(notaTeorico);
-        }
-
-        // ningún filtro
-        return alumnoRepository.findAll();
+        return all;
     }
 
-    public Alumno findById(long id) throws AlumnoNotFoundException{
-        return alumnoRepository.findById(id)
+    public AlumnoDetailOutDto findById(long id) throws AlumnoNotFoundException{
+        return alumnoRepository.findById(id).map(alumno -> modelMapper.map(alumno, AlumnoDetailOutDto.class))
                 .orElseThrow(AlumnoNotFoundException::new);
     }
 
-    public Alumno modify(long id, AlumnoInDto alumnoInDto, Autoescuela autoescuela) throws AlumnoNotFoundException {
+    public AlumnoDetailOutDto modify(long id, AlumnoInDto alumnoInDto, AutoescuelaDetailOutDto autoescuelaDetailOutDto) throws AutoescuelaNotFoundException, AlumnoNotFoundException {
         Alumno a = alumnoRepository.findById(id)
                 .orElseThrow(AlumnoNotFoundException::new);
-
         modelMapper.map(alumnoInDto, a);
-//        oldAlumno.setNombre(alumnoInDto.getNombre());
-//        oldAlumno.setApellidos(alumnoInDto.getApellidos());
-//        oldAlumno.setDni(alumnoInDto.getDni());
-//        oldAlumno.setTelefono(alumnoInDto.getTelefono());
-//        oldAlumno.setEmail(alumnoInDto.getEmail());
-//        oldAlumno.setDireccion(alumnoInDto.getDireccion());
-//        oldAlumno.setCiudad(alumnoInDto.getCiudad());
-//        oldAlumno.setFechaNacimiento(alumnoInDto.getFechaNacimiento());
-//        oldAlumno.setNotaTeorico(alumnoInDto.getNotaTeorico());
-//        oldAlumno.setUsaGafas(alumnoInDto.isUsaGafas());
+//        a.setNombre(alumnoInDto.getNombre());
+//        a.setApellidos(alumnoInDto.getApellidos());
+//        a.setDni(alumnoInDto.getDni());
+//        a.setTelefono(alumnoInDto.getTelefono());
+//        a.setEmail(alumnoInDto.getEmail());
+//        a.setDireccion(alumnoInDto.getDireccion());
+//        a.setCiudad(alumnoInDto.getCiudad());
+//        a.setFechaNacimiento(alumnoInDto.getFechaNacimiento());
+//        a.setNotaTeorico(alumnoInDto.getNotaTeorico());
+//        a.setUsaGafas(alumnoInDto.isUsaGafas());
+        System.out.println(alumnoInDto);
+        System.out.println(a);
+        System.out.println(autoescuelaDetailOutDto);
+        System.out.println(autoescuelaRepository.findById(autoescuelaDetailOutDto.getId()));
+        Autoescuela autoescuela = autoescuelaRepository.findById(autoescuelaDetailOutDto.getId())
+                .orElseThrow(AutoescuelaNotFoundException::new);
         a.setId(id);
         a.setAutoescuela(autoescuela);
 
-        return alumnoRepository.save(a);
+        Alumno alumno = alumnoRepository.save(a);
+        return modelMapper.map(alumno, AlumnoDetailOutDto.class);
     }
 
 }
