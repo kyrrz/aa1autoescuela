@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface ProfesorRepository extends CrudRepository<Profesor, Long> {
     List<Profesor> findAll();
+
     List<Profesor> findByEspecialidad(String especialidad);
     List<Profesor> findByNombre(String nombre);
     List<Profesor> findByActivo(Boolean activo);

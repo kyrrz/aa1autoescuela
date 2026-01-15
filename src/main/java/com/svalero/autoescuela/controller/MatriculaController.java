@@ -1,20 +1,24 @@
 package com.svalero.autoescuela.controller;
 
-import com.svalero.autoescuela.dto.MatriculaInDto;
-import com.svalero.autoescuela.dto.MatriculaOutDto;
+import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.*;
 import com.svalero.autoescuela.model.*;
 import com.svalero.autoescuela.service.AlumnoService;
 import com.svalero.autoescuela.service.AutoescuelaService;
 import com.svalero.autoescuela.service.MatriculaService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class MatriculaController {
@@ -28,37 +32,36 @@ public class MatriculaController {
     private ModelMapper modelMapper;
 
     @GetMapping("/matriculas")
-    public ResponseEntity<List<MatriculaOutDto>> getAll(@RequestParam(value = "modalidad", defaultValue = "") String m) {
-        List<Matricula> matriculas;
-        if (!m.isEmpty()) {
-            matriculas = matriculaService.findByModalidad(m);
-        }else {
-            matriculas = matriculaService.findAll();
-        }
+    public ResponseEntity<List<MatriculaOutDto>> getAll(
+            @RequestParam(required = false) String modalidad,
+            @RequestParam(required = false) String tipoMatricula,
+            @RequestParam(required = false) Integer horasPracticas,
+            @RequestParam(required = false) Integer horasTeoricas
+    ) {
+        List<MatriculaOutDto> mod = matriculaService.findByFiltros(modalidad, tipoMatricula, horasPracticas, horasTeoricas);
 
-        List<MatriculaOutDto> mod = modelMapper.map(matriculas, new TypeToken<List<MatriculaOutDto>>() {}.getType());
         return new ResponseEntity<>(mod, HttpStatus.OK);
     }
     @GetMapping("/matriculas/{id}")
-    public ResponseEntity<Matricula> getMatriculaById(@PathVariable long id) throws MatriculaNotFoundException {
+    public ResponseEntity<MatriculaDetailOutDto> getMatriculaById(@PathVariable long id) throws MatriculaNotFoundException {
         return ResponseEntity.ok(matriculaService.findById(id));
     }
 
     @PostMapping("/matriculas")
-    public ResponseEntity<Matricula> addMatricula(@RequestBody MatriculaInDto matriculaInDto) throws AlumnoNotFoundException, AutoescuelaNotFoundException {
-        Alumno alumno = alumnoService.findById(matriculaInDto.getAlumnoId());
-        Autoescuela autoescuela = autoescuelaService.findById(matriculaInDto.getAutoescuelaId());
-        Matricula m = matriculaService.add(matriculaInDto, alumno, autoescuela);
-        return ResponseEntity.status(HttpStatus.CREATED).body(m);
+    public ResponseEntity<MatriculaDetailOutDto> addMatricula(@Valid  @RequestBody MatriculaInDto matriculaInDto) throws MatriculaNotFoundException, AlumnoNotFoundException, AutoescuelaNotFoundException {
+        AlumnoDetailOutDto alumnoDetailOutDto = alumnoService.findById(matriculaInDto.getAlumnoId());
+        AutoescuelaDetailOutDto autoescuelaDetailOutDto = autoescuelaService.findById(matriculaInDto.getAutoescuelaId());
+        MatriculaDetailOutDto matriculaDetailOutDto = matriculaService.add(matriculaInDto, alumnoDetailOutDto, autoescuelaDetailOutDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(matriculaDetailOutDto);
     }
 
 
     @PutMapping("/matriculas/{id}")
-    public ResponseEntity<Matricula> modifyMatricula(@RequestBody MatriculaInDto matriculaInDto, @PathVariable long id) throws MatriculaNotFoundException,AlumnoNotFoundException, AutoescuelaNotFoundException  {
-        Alumno alumno = alumnoService.findById(matriculaInDto.getAlumnoId());
-        Autoescuela autoescuela = autoescuelaService.findById(matriculaInDto.getAutoescuelaId());
-        Matricula m = matriculaService.modify(id, matriculaInDto, alumno, autoescuela);
-        return ResponseEntity.ok(m);
+    public ResponseEntity<MatriculaDetailOutDto> modifyMatricula(@Valid @RequestBody MatriculaInDto matriculaInDto, @PathVariable long id) throws MatriculaNotFoundException,AlumnoNotFoundException, AutoescuelaNotFoundException  {
+        AlumnoDetailOutDto alumnoDetailOutDto = alumnoService.findById(matriculaInDto.getAlumnoId());
+        AutoescuelaDetailOutDto autoescuelaDetailOutDto = autoescuelaService.findById(matriculaInDto.getAutoescuelaId());
+        MatriculaDetailOutDto matriculaDetailOutDto = matriculaService.modify(id, matriculaInDto, alumnoDetailOutDto, autoescuelaDetailOutDto);
+        return ResponseEntity.ok(matriculaDetailOutDto);
     }
 
     @DeleteMapping("/matriculas/{id}")
@@ -67,18 +70,29 @@ public class MatriculaController {
         return ResponseEntity.noContent().build();
     }
     @ExceptionHandler(MatriculaNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleException(MatriculaNotFoundException anfe){
-        ErrorResponse errorResponse = new ErrorResponse(404, "not-found", "Matricula no encontrada");
+    public ResponseEntity<ErrorResponse> handleException(MatriculaNotFoundException mnfe){
+        ErrorResponse errorResponse = ErrorResponse.notFound("Matricula no encontrada");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(AlumnoNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleException(AlumnoNotFoundException anfe){
-        ErrorResponse errorResponse = new ErrorResponse(404, "not-found", "Alumno no encontrado");
+        ErrorResponse errorResponse = ErrorResponse.notFound("Alumno no encontrado");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(AutoescuelaNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleException(AutoescuelaNotFoundException anfe){
-        ErrorResponse errorResponse = new ErrorResponse(404, "not-found", "Autoescuela no encontrada");
+    public ResponseEntity<ErrorResponse> handleException(AutoescuelaNotFoundException aunfe){
+        ErrorResponse errorResponse = ErrorResponse.notFound("Autoescuela no encontrada");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException manve){
+        Map<String,String> errors = new HashMap<>();
+        manve.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String message = error.getDefaultMessage();
+            errors.put(fieldName,message);
+        });
+        ErrorResponse errorResponse = ErrorResponse.validationError(errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

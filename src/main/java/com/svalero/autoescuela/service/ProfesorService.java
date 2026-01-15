@@ -1,16 +1,22 @@
 package com.svalero.autoescuela.service;
 
-import com.svalero.autoescuela.dto.ProfesorInDto;
+import com.svalero.autoescuela.dto.*;
+import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
+import com.svalero.autoescuela.exception.MatriculaNotFoundException;
 import com.svalero.autoescuela.exception.ProfesorNotFoundException;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.model.Profesor;
+import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.ProfesorRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfesorService {
@@ -19,12 +25,13 @@ public class ProfesorService {
     private ProfesorRepository profesorRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private AutoescuelaRepository autoescuelaRepository;
 
 
-    public Profesor add(ProfesorInDto profesorInDto, List<Autoescuela> autoescuela) {
+    public ProfesorDetailOutDto add(ProfesorInDto profesorInDto, List<AutoescuelaDetailOutDto> autoescuelaDetailOutDtos) throws AutoescuelaNotFoundException {
 
-        Profesor p = new Profesor();
-        modelMapper.map(profesorInDto, p);
+        Profesor p = modelMapper.map(profesorInDto, Profesor.class);
 //        p.setNombre(profesorInDto.getNombre());
 //        p.setApellidos(profesorInDto.getApellidos());
 //        p.setDni(profesorInDto.getDni());
@@ -33,9 +40,15 @@ public class ProfesorService {
 //        p.setFechaContratacion(profesorInDto.getFechaContratacion());
 //        p.setEspecialidad(profesorInDto.getEspecialidad());
 //        p.setActivo(profesorInDto.isActivo());
-        p.setAutoescuelas(autoescuela);
+        List<Long> autoescuelasIds = autoescuelaDetailOutDtos.stream()
+                .map(AutoescuelaDetailOutDto::getId)
+                .toList();
 
-        return profesorRepository.save(p);
+        List<Autoescuela> autoescuelas = (List<Autoescuela>) autoescuelaRepository.findAllById(autoescuelasIds);
+        p.setAutoescuelas(autoescuelas);
+
+        Profesor profesor = profesorRepository.save(p);
+        return modelMapper.map(profesor, ProfesorDetailOutDto.class);
     }
 
     public void delete( long id ) throws ProfesorNotFoundException {
@@ -48,54 +61,65 @@ public class ProfesorService {
         return profesorRepository.findAll();
     }
 
-    public List<Profesor> findByEspecialidad(String especialidad){
-        return profesorRepository.findByEspecialidad(especialidad);
-    }
-
-    public List<Profesor> findByFilters(String nombre, String especialidad, Boolean activo){
+    public List<ProfesorOutDto> findByFilters(String nombre, String especialidad, Boolean activo){
 
         if (nombre != null && especialidad != null && activo != null) {
-            return profesorRepository.findByNombreAndEspecialidadAndActivo(
-                    nombre, especialidad, activo);
+            List<Profesor> profesors = profesorRepository.findByNombreAndEspecialidadAndActivo(nombre, especialidad, activo);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
+        }
+        if ( especialidad != null && activo != null) {
+            List<Profesor> profesors = profesorRepository.findByActivoAndEspecialidad(activo, especialidad);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
+        }
+        if ( nombre != null && activo != null) {
+            List<Profesor> profesors = profesorRepository.findByNombreAndActivo(nombre, activo);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
+        }
+        if ( nombre != null && especialidad != null) {
+            List<Profesor> profesors = profesorRepository.findByNombreAndEspecialidad(nombre, especialidad);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
         }
 
-        if (nombre != null && especialidad != null) {
-            return profesorRepository.findByNombreAndEspecialidad(
-                    nombre, especialidad);
+        if ( activo != null ) {
+            List<Profesor> profesors = profesorRepository.findByActivo(activo);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
+        }
+        if ( nombre != null ) {
+            List<Profesor> profesors = profesorRepository.findByNombre(nombre);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
+        }
+        if ( especialidad != null ) {
+            List<Profesor> profesors = profesorRepository.findByEspecialidad(especialidad);
+            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+
+            return profesorsDto;
         }
 
-        if (nombre != null && activo != null) {
-            return profesorRepository.findByNombreAndActivo(
-                    nombre, activo);
-        }
+        List<Profesor> profesors = profesorRepository.findAll();
+        List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
 
-        if (especialidad != null && activo != null) {
-            return profesorRepository.findByActivoAndEspecialidad(
-                    activo, especialidad);
-        }
-
-        if (nombre != null) {
-            return profesorRepository.findByNombre(nombre);
-        }
-
-        if (especialidad != null) {
-            return profesorRepository.findByEspecialidad(especialidad);
-        }
-
-        if (activo != null) {
-            return profesorRepository.findByActivo(activo);
-        }
-        return profesorRepository.findAll();
-
+        return profesorsDto;
     }
 
-    public Profesor findById(long id) throws ProfesorNotFoundException{
+    public ProfesorDetailOutDto findById(long id) throws ProfesorNotFoundException{
         return profesorRepository.findById(id)
+                .map(profesor -> modelMapper.map(profesor, ProfesorDetailOutDto.class))
                 .orElseThrow(ProfesorNotFoundException::new);
     }
 
-
-    public Profesor modify(long id, ProfesorInDto profesorInDto, List<Autoescuela> autoescuela) throws ProfesorNotFoundException {
+    public ProfesorDetailOutDto modify(long id, ProfesorInDto profesorInDto, List<AutoescuelaDetailOutDto> autoescuelaDetailOutDtos) throws ProfesorNotFoundException {
         Profesor p = profesorRepository.findById(id)
                 .orElseThrow(ProfesorNotFoundException::new);
         modelMapper.map(profesorInDto, p);
@@ -108,7 +132,13 @@ public class ProfesorService {
 //        p.setEspecialidad(profesorInDto.getEspecialidad());
 //        p.setActivo(profesorInDto.isActivo());
         p.setId(id);
-        p.setAutoescuelas(autoescuela);
+        List<Long> autoescuelasIds = autoescuelaDetailOutDtos.stream()
+                .map(AutoescuelaDetailOutDto::getId)
+                .toList();
 
-        return profesorRepository.save(p);
+        List<Autoescuela> autoescuelas = (List<Autoescuela>) autoescuelaRepository.findAllById(autoescuelasIds);
+        p.setAutoescuelas(autoescuelas);
+
+        Profesor profesor = profesorRepository.save(p);
+        return modelMapper.map(profesor, ProfesorDetailOutDto.class);
     }}

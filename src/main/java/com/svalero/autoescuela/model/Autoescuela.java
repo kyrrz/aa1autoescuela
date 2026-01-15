@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -38,6 +39,7 @@ public class Autoescuela {
     private boolean activa;
 
     @OneToMany(mappedBy = "autoescuela")
+    @JsonBackReference
     private List<Matricula> matriculas;
 
     @OneToMany(mappedBy = "autoescuela")
@@ -45,11 +47,9 @@ public class Autoescuela {
     private List<Alumno> alumnos;
 
     @OneToMany(mappedBy = "autoescuela")
+    @JsonBackReference
     private List<Coche> coches;
 
-    @ManyToMany
-    @JoinTable(name = "profesores_autoescuela",
-            joinColumns = @JoinColumn(name = "autoescuela_id"),
-            inverseJoinColumns = @JoinColumn(name = "profesor_id"))
-    private List<Profesor> profesores;
+    @ManyToMany(mappedBy = "autoescuelas")
+    private List<Profesor> profesores = new ArrayList<>();
 }
