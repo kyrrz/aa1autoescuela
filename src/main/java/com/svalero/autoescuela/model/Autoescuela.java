@@ -1,4 +1,5 @@
 package com.svalero.autoescuela.model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +41,7 @@ public class Autoescuela {
     private List<Matricula> matriculas;
 
     @OneToMany(mappedBy = "autoescuela")
+    @JsonBackReference
     private List<Alumno> alumnos;
 
     @OneToMany(mappedBy = "autoescuela")

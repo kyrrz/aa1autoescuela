@@ -1,10 +1,13 @@
 package com.svalero.autoescuela.service;
 
 
+import com.svalero.autoescuela.dto.CocheInDto;
 import com.svalero.autoescuela.exception.CocheNotFoundException;
+import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.model.Coche;
 import com.svalero.autoescuela.repository.CocheRepository;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +18,22 @@ public class CocheService {
 
     @Autowired
     private CocheRepository cocheRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
-    public Coche add(Coche coche){
+    public Coche add(CocheInDto cocheInDto, Autoescuela  autoescuela){
+        Coche coche = new Coche();
+        modelMapper.map(cocheInDto, coche);
+//        coche.setMatricula(cocheInDto.getMatricula());
+//        coche.setMarca(cocheInDto.getMarca());
+//        coche.setModelo(cocheInDto.getModelo());
+//        coche.setTipoCambio(cocheInDto.getTipoCambio());
+//        coche.setKilometraje(cocheInDto.getKilometraje());
+//        coche.setFechaCompra(cocheInDto.getFechaCompra());
+//        coche.setPrecioCompra(cocheInDto.getPrecioCompra());
+//        coche.setDisponible(cocheInDto.getDisponible());
+        coche.setAutoescuela(autoescuela);
+
         return cocheRepository.save(coche);
     }
     public List<Coche> findByMarca(String marca){
@@ -38,22 +55,23 @@ public class CocheService {
                 .orElseThrow(CocheNotFoundException::new);
     }
 
-    public Coche modify(long id, Coche coche) throws CocheNotFoundException {
-        Coche oldCoche = cocheRepository.findById(id)
+    public Coche modify(long id, CocheInDto cocheInDto, Autoescuela autoescuela) throws CocheNotFoundException {
+        Coche coche = cocheRepository.findById(id)
                 .orElseThrow(CocheNotFoundException::new);
 
-        oldCoche.setMatricula(coche.getMatricula());
-        oldCoche.setMarca(coche.getMarca());
-        oldCoche.setModelo(coche.getModelo());
-        oldCoche.setTipoCambio(coche.getTipoCambio());
-        oldCoche.setKilometraje(coche.getKilometraje());
-        oldCoche.setFechaCompra(coche.getFechaCompra());
-        oldCoche.setPrecioCompra(coche.getPrecioCompra());
-        oldCoche.setDisponible(coche.isDisponible());
+        modelMapper.map(cocheInDto, coche);
+//        coche.setMatricula(cocheInDto.getMatricula());
+//        coche.setMarca(cocheInDto.getMarca());
+//        coche.setModelo(cocheInDto.getModelo());
+//        coche.setTipoCambio(cocheInDto.getTipoCambio());
+//        coche.setKilometraje(cocheInDto.getKilometraje());
+//        coche.setFechaCompra(cocheInDto.getFechaCompra());
+//        coche.setPrecioCompra(cocheInDto.getPrecioCompra());
+//        coche.setDisponible(cocheInDto.getDisponible());
+        coche.setAutoescuela(autoescuela);
+        coche.setId(id);
 
-
-
-        return cocheRepository.save(oldCoche);
+        return cocheRepository.save(coche);
     }
 
     }

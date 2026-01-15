@@ -2,12 +2,17 @@ package com.svalero.autoescuela.controller;
 
 
 
+import com.svalero.autoescuela.dto.AlumnoOutDto;
+import com.svalero.autoescuela.dto.AutoescuelaInDto;
+import com.svalero.autoescuela.dto.AutoescuelaOutDto;
 import com.svalero.autoescuela.exception.AlumnoNotFoundException;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.exception.ErrorResponse;
 import com.svalero.autoescuela.model.Alumno;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.service.AutoescuelaService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +25,21 @@ public class AutoescuelaController {
 
     @Autowired
     private AutoescuelaService autoescuelaService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("/autoescuelas")
-    public ResponseEntity<List<Autoescuela>> getAll(@RequestParam(value = "ciudad", defaultValue = "") String c) {
+    public ResponseEntity<List<AutoescuelaOutDto>> getAll(@RequestParam(value = "ciudad", defaultValue = "") String c) {
 
-        List<Autoescuela> a;
+        List<Autoescuela> autoescuelas;
 
         if (!c.isEmpty()) {
-            a = autoescuelaService.findByCiudad(c);
+            autoescuelas = autoescuelaService.findByCiudad(c);
         }else {
-            a = autoescuelaService.findAll();
+            autoescuelas = autoescuelaService.findAll();
         }
-        return ResponseEntity.ok(a);
+        List<AutoescuelaOutDto> out = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType()) ;
+        return ResponseEntity.ok(out);
     }
 
     @GetMapping("/autoescuelas/{id}")
@@ -46,8 +54,8 @@ public class AutoescuelaController {
     }
 
     @PutMapping("/autoescuelas/{id}")
-    public ResponseEntity<Autoescuela> modifyAutoescuela(@RequestBody Autoescuela autoescuela, @PathVariable long id) throws AutoescuelaNotFoundException {
-        Autoescuela a = autoescuelaService.modify(id, autoescuela);
+    public ResponseEntity<Autoescuela> modifyAutoescuela(@RequestBody AutoescuelaInDto autoescuelaInDto, @PathVariable long id) throws AutoescuelaNotFoundException {
+        Autoescuela a = autoescuelaService.modify(id, autoescuelaInDto);
         return ResponseEntity.ok(a);
     }
 

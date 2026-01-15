@@ -1,11 +1,14 @@
 package com.svalero.autoescuela.service;
 
+import com.svalero.autoescuela.dto.AutoescuelaInDto;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,6 +16,8 @@ public class AutoescuelaService {
 
     @Autowired
     private AutoescuelaRepository autoescuelaRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     public Autoescuela add(Autoescuela autoescuela){
         return autoescuelaRepository.save(autoescuela);
@@ -36,21 +41,28 @@ public class AutoescuelaService {
                 .orElseThrow(AutoescuelaNotFoundException::new);
     }
 
-    public Autoescuela modify(long id, Autoescuela autoescuela) throws AutoescuelaNotFoundException {
-        Autoescuela oldAuto = autoescuelaRepository.findById(id)
+    public List<Autoescuela> findAllById(List<Long> ids) throws AutoescuelaNotFoundException{
+        List<Autoescuela> autoescuelas = (List<Autoescuela>) autoescuelaRepository.findAllById(ids);
+        return autoescuelas;
+    }
+
+    public Autoescuela modify(long id, AutoescuelaInDto autoescuelaInDto) throws AutoescuelaNotFoundException {
+        Autoescuela a = autoescuelaRepository.findById(id)
                 .orElseThrow(AutoescuelaNotFoundException::new);
+        modelMapper.map(autoescuelaInDto, a);
+        a.setId(id);
+//        oldAuto.setNombre(autoescuelaInDto.getNombre());
+//        oldAuto.setDireccion(autoescuelaInDto.getDireccion());
+//        oldAuto.setCiudad(autoescuelaInDto.getCiudad());
+//        oldAuto.setTelefono(autoescuelaInDto.getTelefono());
+//        oldAuto.setEmail(autoescuelaInDto.getEmail());
+//        oldAuto.setCapacidad(autoescuelaInDto.getCapacidad());
+//        oldAuto.setRating(autoescuelaInDto.getRating());
+//        oldAuto.setFechaApertura(autoescuelaInDto.getFechaApertura());
+//        oldAuto.setActiva(autoescuelaInDto.isActiva());
 
-        oldAuto.setNombre(autoescuela.getNombre());
-        oldAuto.setDireccion(autoescuela.getDireccion());
-        oldAuto.setCiudad(autoescuela.getCiudad());
-        oldAuto.setTelefono(autoescuela.getTelefono());
-        oldAuto.setEmail(autoescuela.getEmail());
-        oldAuto.setCapacidad(autoescuela.getCapacidad());
-        oldAuto.setRating(autoescuela.getRating());
-        oldAuto.setFechaApertura(autoescuela.getFechaApertura());
-        oldAuto.setActiva(autoescuela.isActiva());
 
-        return autoescuelaRepository.save(oldAuto);
+        return autoescuelaRepository.save(a);
     }
 
 
