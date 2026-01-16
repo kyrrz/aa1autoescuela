@@ -15,6 +15,7 @@ public class MatriculaDetailOutDto
     private String tipoMatricula;
     private int horasPracticas;
     private int horasTeoricas;
+    private boolean completada;
     private AlumnoOutDto alumno;
     private AutoescuelaOutDto autoescuela;
     private String observaciones;

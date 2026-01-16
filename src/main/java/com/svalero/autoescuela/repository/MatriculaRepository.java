@@ -1,7 +1,10 @@
 package com.svalero.autoescuela.repository;
 
 import com.svalero.autoescuela.model.Matricula;
+import org.springframework.data.jpa.repository.NativeQuery;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,6 +12,12 @@ import java.util.List;
 @Repository
 public interface MatriculaRepository extends CrudRepository<Matricula, Long> {
     List<Matricula> findAll();
+
+    @Query(value = "SELECT m FROM matriculas m WHERE m.autoescuela.id = :autoescuelaId")
+    List<Matricula> findMatriculaByAutoescuelaId(@Param("autoescuelaId") Long autoescuelaId);
+
+    @NativeQuery(value = "SELECT * FROM matriculas m WHERE m.autoescuela_id AND m.completada=true")
+    List<Matricula> findMatriculaCompletasByAutoescuelaId(@Param("autoescuelaId") Long autoescuelaId);
 
     List<Matricula> findByModalidad(String modalidad);
     List<Matricula> findByTipoMatricula(String tipoMatricula);

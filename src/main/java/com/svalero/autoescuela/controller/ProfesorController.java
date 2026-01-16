@@ -1,10 +1,7 @@
 package com.svalero.autoescuela.controller;
 
 
-import com.svalero.autoescuela.dto.AutoescuelaDetailOutDto;
-import com.svalero.autoescuela.dto.ProfesorDetailOutDto;
-import com.svalero.autoescuela.dto.ProfesorInDto;
-import com.svalero.autoescuela.dto.ProfesorOutDto;
+import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.exception.ErrorResponse;
 import com.svalero.autoescuela.exception.ProfesorNotFoundException;
@@ -29,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/profesores")
 public class ProfesorController {
 
     @Autowired
@@ -38,7 +36,8 @@ public class ProfesorController {
     @Autowired
     private AutoescuelaService autoescuelaService;
 
-    @GetMapping("/profesores")
+    @GetMapping("")
+
     public ResponseEntity<List<ProfesorOutDto>> getAll(
             @RequestParam(required = false) String especialidad,
             @RequestParam(required = false) Boolean activo,
@@ -49,27 +48,34 @@ public class ProfesorController {
         return ResponseEntity.ok(pod);
     }
 
-    @GetMapping("/profesores/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProfesorDetailOutDto> getProfesorById(@PathVariable long id) throws ProfesorNotFoundException{
         return ResponseEntity.ok(profesorService.findById(id));
     }
 
+    @GetMapping("/{id}/autoescuelas")
+    public ResponseEntity<List<AutoescuelaOutDto>> getAutoescuelaByProfesorId(@PathVariable long id){
 
-    @PostMapping("/profesores")
+        return ResponseEntity.ok(profesorService.getAutoescuelas(id));
+    }
+
+
+
+    @PostMapping("")
     public ResponseEntity<ProfesorDetailOutDto> addProfesor(@Valid @RequestBody ProfesorInDto profesorInDto) throws AutoescuelaNotFoundException {
         List<AutoescuelaDetailOutDto> autoescuelasDetailDtos = autoescuelaService.findAllById(profesorInDto.getAutoescuelaId());
         ProfesorDetailOutDto pdod = profesorService.add(profesorInDto,  autoescuelasDetailDtos);
         return ResponseEntity.status(HttpStatus.CREATED).body(pdod);
     }
 
-    @PutMapping("/profesores/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ProfesorDetailOutDto> modifyProfesor(@Valid  @RequestBody ProfesorInDto profesorInDto, @PathVariable long id) throws ProfesorNotFoundException, AutoescuelaNotFoundException {
         List<AutoescuelaDetailOutDto> autoescuelasDetailDtos = autoescuelaService.findAllById(profesorInDto.getAutoescuelaId());
         ProfesorDetailOutDto pdod = profesorService.modify(id, profesorInDto, autoescuelasDetailDtos);
         return ResponseEntity.ok(pdod);
     }
 
-    @DeleteMapping("/profesores/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfesor(@PathVariable long id) throws ProfesorNotFoundException {
         profesorService.delete(id);
         return ResponseEntity.noContent().build();
