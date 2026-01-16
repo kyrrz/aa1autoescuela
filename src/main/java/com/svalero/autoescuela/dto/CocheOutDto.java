@@ -14,6 +14,5 @@ public class CocheOutDto {
     private String marca;
     private String modelo;
     private String tipoCambio;
-    private AutoescuelaOutDto autoescuela;
 
 }

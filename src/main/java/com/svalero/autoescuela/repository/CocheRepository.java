@@ -1,7 +1,9 @@
 package com.svalero.autoescuela.repository;
 
 import com.svalero.autoescuela.model.Coche;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +12,10 @@ import java.util.List;
 public interface CocheRepository extends CrudRepository<Coche, Long> {
 
     List<Coche> findAll();
+
+
+    @Query(value = "SELECT c FROM coches c WHERE c.autoescuela.id = :autoescuelaId")
+    List<Coche> findCochesByAutoescuelaId(@Param("autoescuelaId") Long autoescuelaId);
 
     List<Coche> findByMarca(String marca);
     List<Coche> findByModelo(String modelo);

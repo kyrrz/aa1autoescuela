@@ -19,6 +19,5 @@ public class ProfesorOutDto {
     private String telefono;
     private String especialidad;
     private boolean activo;
-    private List<AutoescuelaOutDto> autoescuelas;
 
 }

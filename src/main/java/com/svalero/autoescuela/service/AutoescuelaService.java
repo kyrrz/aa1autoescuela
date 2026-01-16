@@ -2,15 +2,15 @@ package com.svalero.autoescuela.service;
 
 import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
-import com.svalero.autoescuela.model.Alumno;
-import com.svalero.autoescuela.model.Autoescuela;
-import com.svalero.autoescuela.repository.AutoescuelaRepository;
+import com.svalero.autoescuela.model.*;
+import com.svalero.autoescuela.repository.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AutoescuelaService {
@@ -19,6 +19,14 @@ public class AutoescuelaService {
     private AutoescuelaRepository autoescuelaRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private ProfesorRepository profesorRepository;
+    @Autowired
+    private CocheRepository cocheRepository;
+    @Autowired
+    private MatriculaRepository matriculaRepository;
+    @Autowired
+    private AlumnoRepository alumnoRepository;
 
     public AutoescuelaDetailOutDto add(AutoescuelaInDto autoescuelaInDto){
 
@@ -133,7 +141,6 @@ public class AutoescuelaService {
         return aod;
     }
 
-
     public AutoescuelaDetailOutDto modify(long id, AutoescuelaInDto autoescuelaInDto) throws AutoescuelaNotFoundException {
         Autoescuela a = autoescuelaRepository.findById(id)
                 .orElseThrow(AutoescuelaNotFoundException::new);
@@ -152,5 +159,38 @@ public class AutoescuelaService {
         return modelMapper.map(au, AutoescuelaDetailOutDto.class);
     }
 
+//    public List<ProfesorOutDto> getProfesores(Long autoescuelaId) throws AutoescuelaNotFoundException {
+//        Autoescuela a = autoescuelaRepository.findById(autoescuelaId)
+//                .orElseThrow(AutoescuelaNotFoundException::new);
+//
+//        return a.getProfesores().stream().map(p -> modelMapper.map(p, ProfesorOutDto.class)).toList();
+//    }
+    public List<CocheOutDto> getCoches(Long autoescuelaId){
+        List<Coche> coche = cocheRepository.findCochesByAutoescuelaId( autoescuelaId);
+        return coche.stream().map(c -> modelMapper.map(c, CocheOutDto.class)).toList();
+    }
+
+    public List<MatriculaOutDto> getMatriculas(Long autoescuelaId){
+        List<Matricula> matricula = matriculaRepository.findMatriculaByAutoescuelaId( autoescuelaId);
+
+        return matricula.stream().map(m -> modelMapper.map(m, MatriculaOutDto.class)).toList();
+    }
+
+    public List<ProfesorOutDto> getProfesores(Long autoescuelaId){
+        List<Profesor> profesor = profesorRepository.findProfesoresByAutoescuelaId(autoescuelaId);
+             return profesor.stream().map(p -> modelMapper.map(p, ProfesorOutDto.class)).toList();
+    }
+
+    public List<MatriculaOutDto> getMatriculasCompletas(Long autoescuelaId){
+        List<Matricula> matriculas = matriculaRepository.findMatriculaCompletasByAutoescuelaId(autoescuelaId);
+
+        return matriculas.stream().map(m -> modelMapper.map(m, MatriculaOutDto.class)).toList();
+    }
+
+    public List<AlumnoOutDto> getAlumnosSuspensos(Long autoescuelaId){
+        List<Alumno> alumnos = alumnoRepository.findAlumnosSuspensosByAutoescuela(autoescuelaId);
+
+        return alumnos.stream().map(a -> modelMapper.map(a, AlumnoOutDto.class)).toList();
+    }
 
 }
