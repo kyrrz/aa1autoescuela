@@ -2,13 +2,11 @@ package com.svalero.autoescuela.service;
 
 import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
-import com.svalero.autoescuela.exception.MatriculaNotFoundException;
 import com.svalero.autoescuela.exception.ProfesorNotFoundException;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.model.Profesor;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.ProfesorRepository;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class ProfesorService {

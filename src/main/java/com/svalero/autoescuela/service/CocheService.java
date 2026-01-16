@@ -12,15 +12,12 @@ import com.svalero.autoescuela.model.Coche;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.CocheRepository;
 
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +103,11 @@ public class CocheService {
 
     public List<Coche> findAll(){
         return cocheRepository.findAll();
+    }
+
+    public List<CocheOutDto> findAllDto(){
+        List<Coche> coches = cocheRepository.findAll();
+        return modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
     }
 
     public CocheDetailOutDto findById(long id) throws CocheNotFoundException{

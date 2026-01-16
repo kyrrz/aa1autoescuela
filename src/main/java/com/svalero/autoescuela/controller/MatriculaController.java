@@ -2,13 +2,11 @@ package com.svalero.autoescuela.controller;
 
 import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.*;
-import com.svalero.autoescuela.model.*;
 import com.svalero.autoescuela.service.AlumnoService;
 import com.svalero.autoescuela.service.AutoescuelaService;
 import com.svalero.autoescuela.service.MatriculaService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
