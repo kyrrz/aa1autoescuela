@@ -4,13 +4,8 @@ package com.svalero.autoescuela.controller;
 
 import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.*;
-import com.svalero.autoescuela.model.Alumno;
-import com.svalero.autoescuela.model.Autoescuela;
-import com.svalero.autoescuela.repository.AlumnoRepository;
 import com.svalero.autoescuela.service.AutoescuelaService;
-import com.svalero.autoescuela.service.ProfesorService;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,7 +61,7 @@ public class AutoescuelaController {
         return ResponseEntity.ok(matricula);
     }
 
-    @GetMapping("/{id}/matriculas/completas")
+    @GetMapping("/{id}/matriculas/completadas")
     public ResponseEntity<List<MatriculaOutDto>> getMatriculasCompletas(@PathVariable Long id) throws AutoescuelaNotFoundException {
 
         return ResponseEntity.ok(

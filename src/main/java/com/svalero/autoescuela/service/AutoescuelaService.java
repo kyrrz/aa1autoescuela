@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @Service
 public class AutoescuelaService {
@@ -115,6 +115,7 @@ public class AutoescuelaService {
                 .map(this::toDetailDto)
                 .toList();
     }
+
 
 
     public List<AutoescuelaOutDto> findByFiltros(String ciudad, String ratingG, Boolean activa){

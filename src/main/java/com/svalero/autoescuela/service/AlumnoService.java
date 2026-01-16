@@ -10,7 +10,6 @@ import com.svalero.autoescuela.model.Alumno;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.repository.AlumnoRepository;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
