@@ -189,13 +189,8 @@ public class AutoescuelaService {
 //        a.setActiva(autoescuelaInDto.isActiva());
         Autoescuela au = autoescuelaRepository.save(a);
         return modelMapper.map(au, AutoescuelaDetailOutDto.class);
- 
-//    public List<ProfesorOutDto> getProfesores(Long autoescuelaId) throws AutoescuelaNotFoundException {
-//        Autoescuela a = autoescuelaRepository.findById(autoescuelaId)
-//                .orElseThrow(AutoescuelaNotFoundException::new);
-//
-//        return a.getProfesores().stream().map(p -> modelMapper.map(p, ProfesorOutDto.class)).toList();
-//    }
+    }
+
     public List<CocheOutDto> getCoches(Long autoescuelaId){
         List<Coche> coche = cocheRepository.findCochesByAutoescuelaId( autoescuelaId);
         return coche.stream().map(c -> modelMapper.map(c, CocheOutDto.class)).toList();
