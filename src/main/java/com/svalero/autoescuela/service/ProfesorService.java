@@ -66,6 +66,11 @@ public class ProfesorService {
         return profesorRepository.findAll();
     }
 
+    public List<AutoescuelaOutDto> getAutoescuelas(Long profesorId) {
+        List<Autoescuela> autoescuela = autoescuelaRepository.findAutoescuelasByProfesorId(profesorId);
+
+        return autoescuela.stream().map(a -> modelMapper.map(a, AutoescuelaOutDto.class)).toList();
+    }
     public List<ProfesorOutDto> findByFilters(String nombre, String especialidad, Boolean activo){
 
         if (nombre != null && especialidad != null && activo != null) {

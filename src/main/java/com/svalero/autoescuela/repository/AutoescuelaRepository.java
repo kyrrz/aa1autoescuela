@@ -1,7 +1,9 @@
 package com.svalero.autoescuela.repository;
 
 import com.svalero.autoescuela.model.Autoescuela;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +12,12 @@ import java.util.List;
 public interface AutoescuelaRepository  extends CrudRepository<Autoescuela, Long> {
 
     List<Autoescuela> findAll();
+
+    @NativeQuery(value = "SELECT a.* FROM autoescuelas a " +
+            "JOIN profesores_autoescuela pa " +
+            "ON a.id = pa.autoescuela_id " +
+            "WHERE pa.profesor_id = :profesorId")
+    List<Autoescuela> findAutoescuelasByProfesorId(@Param("profesorId") Long profesorId);
 
     List<Autoescuela> findByCiudad(String ciudad);
     List<Autoescuela> findByRating(Float rating);

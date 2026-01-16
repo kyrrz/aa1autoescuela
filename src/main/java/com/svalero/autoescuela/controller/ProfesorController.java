@@ -1,10 +1,7 @@
 package com.svalero.autoescuela.controller;
 
 
-import com.svalero.autoescuela.dto.AutoescuelaDetailOutDto;
-import com.svalero.autoescuela.dto.ProfesorDetailOutDto;
-import com.svalero.autoescuela.dto.ProfesorInDto;
-import com.svalero.autoescuela.dto.ProfesorOutDto;
+import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.exception.ErrorResponse;
 import com.svalero.autoescuela.exception.ProfesorNotFoundException;
@@ -52,6 +49,13 @@ public class ProfesorController {
     public ResponseEntity<ProfesorDetailOutDto> getProfesorById(@PathVariable long id) throws ProfesorNotFoundException{
         return ResponseEntity.ok(profesorService.findById(id));
     }
+
+    @GetMapping("/{id}/autoescuelas")
+    public ResponseEntity<List<AutoescuelaOutDto>> getAutoescuelaByProfesorId(@PathVariable long id){
+
+        return ResponseEntity.ok(profesorService.getAutoescuelas(id));
+    }
+
 
 
     @PostMapping("")
