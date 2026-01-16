@@ -15,11 +15,6 @@ public class AppConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-//        modelMapper.createTypeMap(Autoescuela.class, AutoescuelaDetailOutDto.class)
-//                .addMappings(m -> {
-//                    m.skip(AutoescuelaDetailOutDto::setCoches);
-//                    m.skip(AutoescuelaDetailOutDto::setProfesores);
-//                });
         return modelMapper;
     }
 }

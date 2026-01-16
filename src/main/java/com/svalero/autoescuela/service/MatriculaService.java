@@ -11,12 +11,15 @@ import com.svalero.autoescuela.model.Matricula;
 import com.svalero.autoescuela.repository.AlumnoRepository;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.MatriculaRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MatriculaService {
@@ -198,4 +201,71 @@ public class MatriculaService {
 
         return modelMapper.map(matriculaSaved, MatriculaDetailOutDto.class);
     }
+
+    public MatriculaDetailOutDto patch(Long id, Map<String, Object> patch)
+            throws MatriculaNotFoundException{
+
+        Matricula matricula = matriculaRepository.findById(id)
+                .orElseThrow(MatriculaNotFoundException::new);
+
+        patch.forEach((key, value) -> {
+            switch (key) {
+                case "fechaInicio":
+                    matricula.setFechaInicio(LocalDate.parse((String) value));
+                    break;
+                case "fechaFinal":
+                    matricula.setFechaFinal(LocalDate.parse((String) value));
+                    break;
+                case "modalidad":
+                    matricula.setModalidad((String) value);
+                    break;
+                case "tipoMatricula":
+                    matricula.setTipoMatricula((String) value);
+                    break;
+                case "precio":
+                    matricula.setPrecio(((Number) value).floatValue());
+                    break;
+                case "horasPracticas":
+                    matricula.setHorasPracticas(((Number) value).intValue());
+                    break;
+                case "horasTeoricas":
+                    matricula.setHorasTeoricas(((Number) value).intValue());
+                    break;
+                case "completada":
+                    matricula.setCompletada((Boolean) value);
+                    break;
+                case "alumnoId":
+                    Long alumnoId = ((Number) value).longValue();
+                    Alumno alumno = null;
+                    try {
+                        alumno = alumnoRepository.findById(alumnoId)
+                                .orElseThrow(AlumnoNotFoundException::new);
+                    } catch (AlumnoNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    matricula.setAlumno(alumno);
+                    break;
+                case "autoescuelaId":
+                    Long autoescuelaId = ((Number) value).longValue();
+                    Autoescuela autoescuela = null;
+                    try {
+                        autoescuela = autoescuelaRepository.findById(autoescuelaId)
+                                .orElseThrow(AutoescuelaNotFoundException::new);
+                    } catch (AutoescuelaNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    matricula.setAutoescuela(autoescuela);
+                    break;
+                case "observaciones":
+                    matricula.setObservaciones((String) value);
+                    break;
+            }
+        });
+
+        Matricula matriculaActualizada = matriculaRepository.save(matricula);
+        return modelMapper.map(matriculaActualizada, MatriculaDetailOutDto.class);
+    }
+
 }
+
+

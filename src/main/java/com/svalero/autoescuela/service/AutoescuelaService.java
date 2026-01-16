@@ -9,7 +9,10 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,11 +82,40 @@ public class AutoescuelaService {
         return dto;
     }
 
-    public List<AutoescuelaDetailOutDto> findAllById(List<Long> ids){
-        List<Autoescuela> autoescuelas = (List<Autoescuela>) autoescuelaRepository.findAllById(ids);
-        List<AutoescuelaDetailOutDto> autoescuelaDetailOutDtos = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaDetailOutDto>>() {}.getType());
-        return autoescuelaDetailOutDtos;
+    public AutoescuelaDetailOutDto toDetailDto(Autoescuela a) {
+
+        AutoescuelaDetailOutDto dto = new AutoescuelaDetailOutDto();
+        dto.setId(a.getId());
+        dto.setNombre(a.getNombre());
+        dto.setDireccion(a.getDireccion());
+        dto.setCiudad(a.getCiudad());
+        dto.setTelefono(a.getTelefono());
+        dto.setEmail(a.getEmail());
+        dto.setRating(a.getRating());
+        dto.setActiva(a.isActiva());
+        dto.setCoches(
+                a.getCoches().stream().map(coche -> modelMapper.map(coche, CocheOutDto.class)).toList()
+        );
+
+        dto.setProfesores(
+                a.getProfesores().stream().map(p -> modelMapper.map(p, ProfesorOutDto.class)).toList()
+        );
+
+        return dto;
     }
+
+    public List<AutoescuelaDetailOutDto> findAllById(List<Long> ids) {
+
+        Iterable<Autoescuela> iterable = autoescuelaRepository.findAllById(ids);
+
+        List<Autoescuela> autoescuelas = new ArrayList<>();
+        iterable.forEach(autoescuelas::add);
+
+        return autoescuelas.stream()
+                .map(this::toDetailDto)
+                .toList();
+    }
+
 
     public List<AutoescuelaOutDto> findByFiltros(String ciudad, String ratingG, Boolean activa){
 
@@ -157,8 +189,7 @@ public class AutoescuelaService {
 //        a.setActiva(autoescuelaInDto.isActiva());
         Autoescuela au = autoescuelaRepository.save(a);
         return modelMapper.map(au, AutoescuelaDetailOutDto.class);
-    }
-
+ 
 //    public List<ProfesorOutDto> getProfesores(Long autoescuelaId) throws AutoescuelaNotFoundException {
 //        Autoescuela a = autoescuelaRepository.findById(autoescuelaId)
 //                .orElseThrow(AutoescuelaNotFoundException::new);
@@ -193,4 +224,44 @@ public class AutoescuelaService {
         return alumnos.stream().map(a -> modelMapper.map(a, AlumnoOutDto.class)).toList();
     }
 
+   public AutoescuelaDetailOutDto patch(Long id, Map<String, Object> patch)
+            throws AutoescuelaNotFoundException {
+        Autoescuela autoescuela = autoescuelaRepository.findById(id)
+                .orElseThrow(AutoescuelaNotFoundException::new);
+
+        patch.forEach((key, value) -> {
+            switch (key) {
+                case "nombre":
+                    autoescuela.setNombre((String) value);
+                    break;
+                case "direccion":
+                    autoescuela.setDireccion((String) value);
+                    break;
+                case "ciudad":
+                    autoescuela.setCiudad((String) value);
+                    break;
+                case "telefono":
+                    autoescuela.setTelefono((String) value);
+                    break;
+                case "email":
+                    autoescuela.setEmail((String) value);
+                    break;
+                case "capacidad":
+                    autoescuela.setCapacidad(((Number) value).intValue());
+                    break;
+                case "rating":
+                    autoescuela.setRating(((Number) value).floatValue());
+                    break;
+                case "fechaApertura":
+                    autoescuela.setFechaApertura(LocalDate.parse((String) value));
+                    break;
+                case "activa":
+                    autoescuela.setActiva((Boolean) value);
+                    break;
+            }
+        });
+
+        Autoescuela autoescuelaActualizada = autoescuelaRepository.save(autoescuela);
+        return modelMapper.map(autoescuelaActualizada, AutoescuelaDetailOutDto.class);
+    }
 }

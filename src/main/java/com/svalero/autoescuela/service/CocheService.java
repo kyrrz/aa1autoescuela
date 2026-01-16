@@ -12,14 +12,17 @@ import com.svalero.autoescuela.model.Coche;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.CocheRepository;
 
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CocheService {
@@ -49,7 +52,6 @@ public class CocheService {
         Coche savedCoche = cocheRepository.save(coche);
         return modelMapper.map(savedCoche, CocheDetailOutDto.class);
     }
-
 
     public List<CocheOutDto> findByFiltros(String marca, String modelo, String tipoCambio){
 
@@ -133,4 +135,53 @@ public class CocheService {
         return modelMapper.map(savedCoche, CocheDetailOutDto.class);
     }
 
+    public CocheDetailOutDto patch(Long id, Map<String, Object> patch)
+            throws CocheNotFoundException {
+
+        Coche coche = cocheRepository.findById(id)
+                .orElseThrow(CocheNotFoundException::new);
+
+        patch.forEach((key, value) -> {
+            switch (key) {
+                case "matricula":
+                    coche.setMatricula((String) value);
+                    break;
+                case "marca":
+                    coche.setMarca((String) value);
+                    break;
+                case "modelo":
+                    coche.setModelo((String) value);
+                    break;
+                case "tipoCambio":
+                    coche.setTipoCambio((String) value);
+                    break;
+                case "kilometraje":
+                    coche.setKilometraje(((Number) value).intValue());
+                    break;
+                case "fechaCompra":
+                    coche.setFechaCompra(LocalDate.parse((String) value));
+                    break;
+                case "precioCompra":
+                    coche.setPrecioCompra(((Number) value).floatValue());
+                    break;
+                case "disponible":
+                    coche.setDisponible((Boolean) value);
+                    break;
+                case "autoescuelaId":
+                    Long autoescuelaId = ((Number) value).longValue();
+                    Autoescuela autoescuela = null;
+                    try {
+                        autoescuela = autoescuelaRepository.findById(autoescuelaId)
+                                .orElseThrow(AutoescuelaNotFoundException::new);
+                    } catch (AutoescuelaNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    coche.setAutoescuela(autoescuela);
+                    break;
+            }
+        });
+
+        Coche cocheActualizado = cocheRepository.save(coche);
+        return modelMapper.map(cocheActualizado, CocheDetailOutDto.class);
+    }
     }

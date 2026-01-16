@@ -11,7 +11,6 @@ import com.svalero.autoescuela.service.AutoescuelaService;
 import com.svalero.autoescuela.service.ProfesorService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +29,7 @@ public class AutoescuelaController {
     @Autowired
     private AutoescuelaService autoescuelaService;
 
-
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<List<AutoescuelaOutDto>> getAll(
             @RequestParam(required = false) String ciudad,
             @RequestParam(required = false) String ratingG,
@@ -99,6 +97,12 @@ public class AutoescuelaController {
     public ResponseEntity<Void> deleteAutoescuela(@PathVariable long id) throws AutoescuelaNotFoundException {
         autoescuelaService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AutoescuelaDetailOutDto> patchAutoescuela(@PathVariable Long id, @RequestBody Map<String, Object> patch) throws AutoescuelaNotFoundException {
+        AutoescuelaDetailOutDto autoescuelaPatch = autoescuelaService.patch(id, patch);
+        return ResponseEntity.ok(autoescuelaPatch);
     }
 
 

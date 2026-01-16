@@ -27,6 +27,7 @@ import java.util.Map;
 
 
 @RestController
+@RequestMapping("/alumnos")
 public class AlumnoController {
 
     @Autowired
@@ -36,7 +37,7 @@ public class AlumnoController {
     @Autowired
     private AutoescuelaService autoescuelaService;
 
-    @GetMapping("/alumnos")
+    @GetMapping("")
     public ResponseEntity<List<AlumnoOutDto>> getAll(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String ciudad,
@@ -47,13 +48,13 @@ public class AlumnoController {
         return ResponseEntity.ok(alumnoOutDtos);
     }
 
-    @GetMapping("/alumnos/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AlumnoDetailOutDto> getAlumnoById(@PathVariable long id) throws AlumnoNotFoundException{
         return ResponseEntity.ok(alumnoService.findById(id));
     }
 
 
-    @PostMapping("/alumnos")
+    @PostMapping("")
     public ResponseEntity<AlumnoDetailOutDto> addAlumno(@Valid @RequestBody AlumnoInDto alumnoInDto) throws AutoescuelaNotFoundException {
 
         AutoescuelaDetailOutDto autoescuelaDetailOutDto = autoescuelaService.findById(alumnoInDto.getAutoescuelaId());
@@ -62,12 +63,8 @@ public class AlumnoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoAlumno);
     }
 
-    @PutMapping("/alumnos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<AlumnoDetailOutDto> modifyAlumno(@Valid @RequestBody AlumnoInDto alumnoInDto, @PathVariable long id) throws AlumnoNotFoundException, AutoescuelaNotFoundException {
-        System.out.println("==============================================");
-        System.out.println("autoescuelaId = " + alumnoInDto.getAutoescuelaId());
-        System.out.println("autoescuelaDetailOutDto = " + autoescuelaService.findById(alumnoInDto.getAutoescuelaId()));
-        System.out.println("==========================================");
         AutoescuelaDetailOutDto autoescuelaDetailOutDto = autoescuelaService.findById(alumnoInDto.getAutoescuelaId());
         System.out.println(autoescuelaDetailOutDto);
         AlumnoDetailOutDto alumnoUpdated = alumnoService.modify(id, alumnoInDto, autoescuelaDetailOutDto);
@@ -75,10 +72,16 @@ public class AlumnoController {
         return ResponseEntity.ok(alumnoUpdated);
     }
 
-    @DeleteMapping("/alumnos/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAlumno(@PathVariable long id) throws AlumnoNotFoundException {
         alumnoService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AlumnoDetailOutDto> patchAlumno(@RequestBody Map<String, Object> patch, @PathVariable long id) throws AlumnoNotFoundException, AutoescuelaNotFoundException {
+        AlumnoDetailOutDto alumnoDetailOutDto = alumnoService.patch(id, patch);
+        return  ResponseEntity.ok(alumnoDetailOutDto);
     }
 
     @ExceptionHandler(AlumnoNotFoundException.class)

@@ -20,7 +20,7 @@ public class ProfesorDetailOutDto {
     private String apellidos;
     private String dni;
     private String telefono;
-    private String salario;
+    private float salario;
     private LocalDate fechaContratacion;
     private String especialidad;
     private boolean activo;

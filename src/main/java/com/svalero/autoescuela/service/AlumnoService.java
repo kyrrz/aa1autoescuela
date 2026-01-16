@@ -10,12 +10,15 @@ import com.svalero.autoescuela.model.Alumno;
 import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.repository.AlumnoRepository;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AlumnoService {
@@ -26,7 +29,6 @@ public class AlumnoService {
     private ModelMapper modelMapper;
     @Autowired
     private AutoescuelaRepository autoescuelaRepository;
-
 
     public AlumnoDetailOutDto add(AlumnoInDto alumnoInDto, AutoescuelaDetailOutDto autoescuelaDetailOutDto) throws AutoescuelaNotFoundException {
         Alumno alumno = modelMapper.map(alumnoInDto, Alumno.class);
@@ -61,7 +63,6 @@ public class AlumnoService {
 
         return all;
     }
-
 
     public List<AlumnoOutDto> findByFiltros(String nombre, String ciudad, Boolean usaGafas, Float notaTeorico){
         if (nombre != null && ciudad != null && usaGafas != null && notaTeorico != null) {
@@ -158,21 +159,18 @@ public class AlumnoService {
     public AlumnoDetailOutDto modify(long id, AlumnoInDto alumnoInDto, AutoescuelaDetailOutDto autoescuelaDetailOutDto) throws AutoescuelaNotFoundException, AlumnoNotFoundException {
         Alumno a = alumnoRepository.findById(id)
                 .orElseThrow(AlumnoNotFoundException::new);
-        modelMapper.map(alumnoInDto, a);
-//        a.setNombre(alumnoInDto.getNombre());
-//        a.setApellidos(alumnoInDto.getApellidos());
-//        a.setDni(alumnoInDto.getDni());
-//        a.setTelefono(alumnoInDto.getTelefono());
-//        a.setEmail(alumnoInDto.getEmail());
-//        a.setDireccion(alumnoInDto.getDireccion());
-//        a.setCiudad(alumnoInDto.getCiudad());
-//        a.setFechaNacimiento(alumnoInDto.getFechaNacimiento());
-//        a.setNotaTeorico(alumnoInDto.getNotaTeorico());
-//        a.setUsaGafas(alumnoInDto.isUsaGafas());
-        System.out.println(alumnoInDto);
-        System.out.println(a);
-        System.out.println(autoescuelaDetailOutDto);
-        System.out.println(autoescuelaRepository.findById(autoescuelaDetailOutDto.getId()));
+
+        a.setNombre(alumnoInDto.getNombre());
+        a.setApellidos(alumnoInDto.getApellidos());
+        a.setDni(alumnoInDto.getDni());
+        a.setTelefono(alumnoInDto.getTelefono());
+        a.setEmail(alumnoInDto.getEmail());
+        a.setDireccion(alumnoInDto.getDireccion());
+        a.setCiudad(alumnoInDto.getCiudad());
+        a.setFechaNacimiento(alumnoInDto.getFechaNacimiento());
+        a.setNotaTeorico(alumnoInDto.getNotaTeorico());
+        a.setUsaGafas(alumnoInDto.isUsaGafas());
+
         Autoescuela autoescuela = autoescuelaRepository.findById(autoescuelaDetailOutDto.getId())
                 .orElseThrow(AutoescuelaNotFoundException::new);
         a.setId(id);
@@ -182,4 +180,55 @@ public class AlumnoService {
         return modelMapper.map(alumno, AlumnoDetailOutDto.class);
     }
 
+    public AlumnoDetailOutDto patch(long id, Map<String, Object> patch) throws AlumnoNotFoundException {
+        Alumno alumno = alumnoRepository.findById(id).orElseThrow(AlumnoNotFoundException::new);
+
+        patch.forEach((key, value) -> {
+            switch (key) {
+                case "nombre":
+                    alumno.setNombre((String) value);
+                    break;
+                case "apellidos":
+                    alumno.setApellidos((String) value);
+                    break;
+                case "dni":
+                    alumno.setDni((String) value);
+                    break;
+                case "fechaNacimiento":
+                    alumno.setFechaNacimiento(LocalDate.parse((String) value));
+                    break;
+                case "telefono":
+                    alumno.setTelefono((String) value);
+                    break;
+                case "email":
+                    alumno.setEmail((String) value);
+                    break;
+                case "direccion":
+                    alumno.setDireccion((String) value);
+                    break;
+                case "ciudad":
+                    alumno.setCiudad((String) value);
+                    break;
+                case "usaGafas":
+                    alumno.setUsaGafas((Boolean) value);
+                    break;
+                case "notaTeorico":
+                    alumno.setNotaTeorico(((Number) value).floatValue());
+                    break;
+                case "autoescuelaId":
+                    Long autoescuelaId = ((Number) value).longValue();
+                    Autoescuela autoescuela = null;
+                    try {
+                        autoescuela = autoescuelaRepository.findById(autoescuelaId).orElseThrow(AutoescuelaNotFoundException::new);
+                    } catch (AutoescuelaNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    alumno.setAutoescuela(autoescuela);
+                    break;
+            }
+
+        });
+        Alumno alumnoPatch = alumnoRepository.save(alumno);
+        return modelMapper.map(alumnoPatch, AlumnoDetailOutDto.class);
+    }
 }

@@ -8,14 +8,17 @@ import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.model.Profesor;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.ProfesorRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,9 +43,11 @@ public class ProfesorService {
 //        p.setFechaContratacion(profesorInDto.getFechaContratacion());
 //        p.setEspecialidad(profesorInDto.getEspecialidad());
 //        p.setActivo(profesorInDto.isActivo());
-        List<Long> autoescuelasIds = autoescuelaDetailOutDtos.stream()
-                .map(AutoescuelaDetailOutDto::getId)
-                .toList();
+        List<Long> autoescuelasIds = new ArrayList<>();
+        for (AutoescuelaDetailOutDto autoescuelaDetailOutDto : autoescuelaDetailOutDtos) {
+            Long id = autoescuelaDetailOutDto.getId();
+            autoescuelasIds.add(id);
+        }
 
         List<Autoescuela> autoescuelas = (List<Autoescuela>) autoescuelaRepository.findAllById(autoescuelasIds);
         p.setAutoescuelas(autoescuelas);
@@ -146,4 +151,59 @@ public class ProfesorService {
 
         Profesor profesor = profesorRepository.save(p);
         return modelMapper.map(profesor, ProfesorDetailOutDto.class);
-    }}
+    }
+
+    public ProfesorDetailOutDto patch(Long id, Map<String, Object> patch)
+            throws ProfesorNotFoundException, AutoescuelaNotFoundException {
+
+        Profesor profesor = profesorRepository.findById(id)
+                .orElseThrow(ProfesorNotFoundException::new);
+
+        patch.forEach((key, value) -> {
+            switch (key) {
+                case "nombre":
+                    profesor.setNombre((String) value);
+                    break;
+                case "apellidos":
+                    profesor.setApellidos((String) value);
+                    break;
+                case "dni":
+                    profesor.setDni((String) value);
+                    break;
+                case "telefono":
+                    profesor.setTelefono((String) value);
+                    break;
+                case "salario":
+                    profesor.setSalario(((Number) value).floatValue());
+                    break;
+                case "fechaContratacion":
+                    profesor.setFechaContratacion(LocalDate.parse((String) value));
+                    break;
+                case "especialidad":
+                    profesor.setEspecialidad((String) value);
+                    break;
+                case "activo":
+                    profesor.setActivo((Boolean) value);
+                    break;
+                case "autoescuelaId":
+                    @SuppressWarnings("unchecked")
+                    List<Long> ids = ((List<Long>) value);
+                    System.out.println("====================");
+                    System.out.println(value);
+                    System.out.println("====================");
+                    System.out.println(ids);
+                    System.out.println("====================");
+                    List<Autoescuela> autoescuelas;
+                    autoescuelas = (List<Autoescuela>) autoescuelaRepository.findAllById(ids);
+                    profesor.setAutoescuelas(autoescuelas);
+                    break;
+            }
+        });
+
+        Profesor profesorActualizado = profesorRepository.save(profesor);
+        return modelMapper.map(profesorActualizado, ProfesorDetailOutDto.class);
+    }
+
+
+}
+

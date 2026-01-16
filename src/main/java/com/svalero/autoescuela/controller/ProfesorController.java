@@ -32,12 +32,9 @@ public class ProfesorController {
     @Autowired
     private ProfesorService profesorService;
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private AutoescuelaService autoescuelaService;
 
     @GetMapping("")
-
     public ResponseEntity<List<ProfesorOutDto>> getAll(
             @RequestParam(required = false) String especialidad,
             @RequestParam(required = false) Boolean activo,
@@ -79,6 +76,16 @@ public class ProfesorController {
     public ResponseEntity<Void> deleteProfesor(@PathVariable long id) throws ProfesorNotFoundException {
         profesorService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProfesorDetailOutDto> patchProfesor(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> patch)
+            throws ProfesorNotFoundException, AutoescuelaNotFoundException {
+
+        ProfesorDetailOutDto profesorActualizado = profesorService.patch(id, patch);
+        return ResponseEntity.ok(profesorActualizado);
     }
 
     @ExceptionHandler(ProfesorNotFoundException.class)
