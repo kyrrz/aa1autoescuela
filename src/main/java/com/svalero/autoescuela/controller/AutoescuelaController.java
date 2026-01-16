@@ -14,7 +14,6 @@ import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.service.AutoescuelaService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/autoescuelas")
 public class AutoescuelaController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class AutoescuelaController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping("/autoescuelas")
+    @GetMapping("")
     public ResponseEntity<List<AutoescuelaOutDto>> getAll(
             @RequestParam(required = false) String ciudad,
             @RequestParam(required = false) String ratingG,
@@ -45,28 +45,34 @@ public class AutoescuelaController {
         return ResponseEntity.ok(autoescuelaOutDtos);
     }
 
-    @GetMapping("/autoescuelas/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AutoescuelaDetailOutDto> getAutoescuelaById(@PathVariable long id) throws AutoescuelaNotFoundException {
         return ResponseEntity.ok(autoescuelaService.findById(id));
     }
 
 
-    @PostMapping("/autoescuelas")
+    @PostMapping("")
     public ResponseEntity<AutoescuelaDetailOutDto> addAutoescuela(@Valid  @RequestBody AutoescuelaInDto autoescuelaInDto){
         AutoescuelaDetailOutDto a = autoescuelaService.add(autoescuelaInDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(a);
     }
 
-    @PutMapping("/autoescuelas/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<AutoescuelaDetailOutDto> modifyAutoescuela(@Valid @RequestBody AutoescuelaInDto autoescuelaInDto, @PathVariable long id) throws AutoescuelaNotFoundException {
         AutoescuelaDetailOutDto a = autoescuelaService.modify(id, autoescuelaInDto);
         return ResponseEntity.ok(a);
     }
 
-    @DeleteMapping("/autoescuelas/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAutoescuela(@PathVariable long id) throws AutoescuelaNotFoundException {
         autoescuelaService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AutoescuelaDetailOutDto> patchAutoescuela(@PathVariable Long id, @RequestBody Map<String, Object> patch) throws AutoescuelaNotFoundException {
+        AutoescuelaDetailOutDto autoescuelaPatch = autoescuelaService.patch(id, patch);
+        return ResponseEntity.ok(autoescuelaPatch);
     }
 
 

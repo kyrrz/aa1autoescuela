@@ -15,8 +15,8 @@ public class MatriculaDetailOutDto
     private String tipoMatricula;
     private int horasPracticas;
     private int horasTeoricas;
-    private AlumnoOutDto alumno;
     private AutoescuelaOutDto autoescuela;
+    private AlumnoOutDto alumno;
     private String observaciones;
 
 }

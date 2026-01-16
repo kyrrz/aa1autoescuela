@@ -29,16 +29,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/profesores")
 public class ProfesorController {
 
     @Autowired
     private ProfesorService profesorService;
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private AutoescuelaService autoescuelaService;
 
-    @GetMapping("/profesores")
+    @GetMapping("")
     public ResponseEntity<List<ProfesorOutDto>> getAll(
             @RequestParam(required = false) String especialidad,
             @RequestParam(required = false) Boolean activo,
@@ -49,30 +48,40 @@ public class ProfesorController {
         return ResponseEntity.ok(pod);
     }
 
-    @GetMapping("/profesores/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProfesorDetailOutDto> getProfesorById(@PathVariable long id) throws ProfesorNotFoundException{
         return ResponseEntity.ok(profesorService.findById(id));
     }
 
 
-    @PostMapping("/profesores")
+    @PostMapping("")
     public ResponseEntity<ProfesorDetailOutDto> addProfesor(@Valid @RequestBody ProfesorInDto profesorInDto) throws AutoescuelaNotFoundException {
         List<AutoescuelaDetailOutDto> autoescuelasDetailDtos = autoescuelaService.findAllById(profesorInDto.getAutoescuelaId());
         ProfesorDetailOutDto pdod = profesorService.add(profesorInDto,  autoescuelasDetailDtos);
         return ResponseEntity.status(HttpStatus.CREATED).body(pdod);
     }
 
-    @PutMapping("/profesores/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ProfesorDetailOutDto> modifyProfesor(@Valid  @RequestBody ProfesorInDto profesorInDto, @PathVariable long id) throws ProfesorNotFoundException, AutoescuelaNotFoundException {
         List<AutoescuelaDetailOutDto> autoescuelasDetailDtos = autoescuelaService.findAllById(profesorInDto.getAutoescuelaId());
         ProfesorDetailOutDto pdod = profesorService.modify(id, profesorInDto, autoescuelasDetailDtos);
         return ResponseEntity.ok(pdod);
     }
 
-    @DeleteMapping("/profesores/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfesor(@PathVariable long id) throws ProfesorNotFoundException {
         profesorService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProfesorDetailOutDto> patchProfesor(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> patch)
+            throws ProfesorNotFoundException, AutoescuelaNotFoundException {
+
+        ProfesorDetailOutDto profesorActualizado = profesorService.patch(id, patch);
+        return ResponseEntity.ok(profesorActualizado);
     }
 
     @ExceptionHandler(ProfesorNotFoundException.class)
