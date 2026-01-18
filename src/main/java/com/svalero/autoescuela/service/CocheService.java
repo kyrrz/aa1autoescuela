@@ -12,9 +12,11 @@ import com.svalero.autoescuela.model.Coche;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.CocheRepository;
 
+import com.svalero.autoescuela.specification.CocheSpecification;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -50,49 +52,60 @@ public class CocheService {
         return modelMapper.map(savedCoche, CocheDetailOutDto.class);
     }
 
-    public List<CocheOutDto> findByFiltros(String marca, String modelo, String tipoCambio){
+//    public List<CocheOutDto> findByFiltros(String marca, String modelo, String tipoCambio){
+//
+//        if (marca != null && modelo != null && tipoCambio != null) {
+//            List<Coche> coches = cocheRepository.findByMarcaAndModeloAndTipoCambio(marca, modelo, tipoCambio);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//
+//        if (modelo != null && tipoCambio != null) {
+//            List<Coche> coches = cocheRepository.findByModeloAndTipoCambio(modelo, tipoCambio);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//        if (marca != null && tipoCambio != null) {
+//            List<Coche> coches = cocheRepository.findByMarcaAndTipoCambio(marca, tipoCambio);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//        if (modelo != null && marca != null) {
+//            List<Coche> coches = cocheRepository.findByMarcaAndModelo(marca, modelo);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//
+//        if (tipoCambio != null) {
+//            List<Coche> coches = cocheRepository.findByTipoCambio(tipoCambio);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//        if (modelo != null) {
+//            List<Coche> coches = cocheRepository.findByModelo(modelo);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//        if (marca != null) {
+//            List<Coche> coches = cocheRepository.findByMarca(marca);
+//            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//            return cocheOutDtos;
+//        }
+//
+//        List<Coche>  coches = cocheRepository.findAll();
+//        List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
+//        return cocheOutDtos;
+//    }
 
-        if (marca != null && modelo != null && tipoCambio != null) {
-            List<Coche> coches = cocheRepository.findByMarcaAndModeloAndTipoCambio(marca, modelo, tipoCambio);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
+    public List<CocheOutDto> findByFiltros(String marca, String modelo, String tipoCambio) {
 
-        if (modelo != null && tipoCambio != null) {
-            List<Coche> coches = cocheRepository.findByModeloAndTipoCambio(modelo, tipoCambio);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
-        if (marca != null && tipoCambio != null) {
-            List<Coche> coches = cocheRepository.findByMarcaAndTipoCambio(marca, tipoCambio);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
-        if (modelo != null && marca != null) {
-            List<Coche> coches = cocheRepository.findByMarcaAndModelo(marca, modelo);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
+        Specification<Coche> spec = Specification
+                .where(CocheSpecification.marcaEquals(marca))
+                .and(CocheSpecification.modeloEquals(modelo))
+                .and(CocheSpecification.tipoCambioEquals(tipoCambio));
 
-        if (tipoCambio != null) {
-            List<Coche> coches = cocheRepository.findByTipoCambio(tipoCambio);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
-        if (modelo != null) {
-            List<Coche> coches = cocheRepository.findByModelo(modelo);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
-        if (marca != null) {
-            List<Coche> coches = cocheRepository.findByMarca(marca);
-            List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-            return cocheOutDtos;
-        }
-
-        List<Coche>  coches = cocheRepository.findAll();
-        List<CocheOutDto> cocheOutDtos = modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
-        return cocheOutDtos;
+        List<Coche> coches = cocheRepository.findAll(spec);
+        return modelMapper.map(coches, new TypeToken<List<CocheOutDto>>() {}.getType());
     }
 
     public void delete( long id ) throws CocheNotFoundException {
@@ -138,12 +151,14 @@ public class CocheService {
     }
 
     public CocheDetailOutDto patch(Long id, Map<String, Object> patch)
-            throws CocheNotFoundException {
+            throws AutoescuelaNotFoundException, CocheNotFoundException {
 
         Coche coche = cocheRepository.findById(id)
                 .orElseThrow(CocheNotFoundException::new);
 
-        patch.forEach((key, value) -> {
+        for (Map.Entry<String, Object> entry : patch.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
             switch (key) {
                 case "matricula":
                     coche.setMatricula((String) value);
@@ -171,17 +186,12 @@ public class CocheService {
                     break;
                 case "autoescuelaId":
                     Long autoescuelaId = ((Number) value).longValue();
-                    Autoescuela autoescuela = null;
-                    try {
-                        autoescuela = autoescuelaRepository.findById(autoescuelaId)
-                                .orElseThrow(AutoescuelaNotFoundException::new);
-                    } catch (AutoescuelaNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Autoescuela autoescuela = autoescuelaRepository.findById(autoescuelaId)
+                            .orElseThrow(AutoescuelaNotFoundException::new);
                     coche.setAutoescuela(autoescuela);
                     break;
             }
-        });
+        };
 
         Coche cocheActualizado = cocheRepository.save(coche);
         return modelMapper.map(cocheActualizado, CocheDetailOutDto.class);

@@ -2,6 +2,7 @@ package com.svalero.autoescuela.repository;
 
 
 import com.svalero.autoescuela.model.Alumno;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AlumnoRepository extends CrudRepository<Alumno, Long>{
+public interface AlumnoRepository extends CrudRepository<Alumno, Long>, JpaSpecificationExecutor<Alumno> {
     List<Alumno> findAll();
 
     @NativeQuery(value = "SELECT * FROM alumnos a WHERE a.autoescuela_id = :autoescuelaId AND a.nota_teorico < 5")

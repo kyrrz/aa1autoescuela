@@ -5,6 +5,7 @@ import com.svalero.autoescuela.dto.CocheDetailOutDto;
 import com.svalero.autoescuela.dto.CocheInDto;
 import com.svalero.autoescuela.dto.CocheOutDto;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
+import com.svalero.autoescuela.exception.BadRequestException;
 import com.svalero.autoescuela.exception.CocheNotFoundException;
 import com.svalero.autoescuela.exception.ErrorResponse;
 import com.svalero.autoescuela.service.AutoescuelaService;
@@ -99,6 +100,12 @@ public class CocheController {
             errors.put(fieldName,message);
         });
         ErrorResponse errorResponse = ErrorResponse.validationError(errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleException(BadRequestException bre){
+        ErrorResponse errorResponse = ErrorResponse.badRequest("Bad request");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

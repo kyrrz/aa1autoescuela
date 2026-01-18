@@ -6,7 +6,6 @@ import com.svalero.autoescuela.service.AlumnoService;
 import com.svalero.autoescuela.service.AutoescuelaService;
 import com.svalero.autoescuela.service.MatriculaService;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,6 @@ public class MatriculaController {
     private AlumnoService alumnoService;
     @Autowired
     private AutoescuelaService autoescuelaService;
-    @Autowired
-    private ModelMapper modelMapper;
 
     @GetMapping("")
     public ResponseEntity<List<MatriculaOutDto>> getAll(
@@ -70,7 +67,7 @@ public class MatriculaController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<MatriculaDetailOutDto> patchMatricula(@PathVariable Long id, @RequestBody Map<String, Object> patch) throws MatriculaNotFoundException {
+    public ResponseEntity<MatriculaDetailOutDto> patchMatricula(@PathVariable Long id, @RequestBody Map<String, Object> patch) throws MatriculaNotFoundException, AutoescuelaNotFoundException, AlumnoNotFoundException {
 
         MatriculaDetailOutDto matriculaActualizada = matriculaService.patch(id, patch);
         return ResponseEntity.ok(matriculaActualizada);
@@ -103,6 +100,11 @@ public class MatriculaController {
             errors.put(fieldName,message);
         });
         ErrorResponse errorResponse = ErrorResponse.validationError(errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleException(BadRequestException bre){
+        ErrorResponse errorResponse = ErrorResponse.badRequest("Bad request");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

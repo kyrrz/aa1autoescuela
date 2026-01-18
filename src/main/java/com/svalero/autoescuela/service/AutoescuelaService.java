@@ -2,11 +2,14 @@ package com.svalero.autoescuela.service;
 
 import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
+import com.svalero.autoescuela.exception.BadRequestException;
 import com.svalero.autoescuela.model.*;
 import com.svalero.autoescuela.repository.*;
+import com.svalero.autoescuela.specification.AutoescuelaSpecification;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -118,60 +121,65 @@ public class AutoescuelaService {
 
 
 
-    public List<AutoescuelaOutDto> findByFiltros(String ciudad, String ratingG, Boolean activa){
+//    public List<AutoescuelaOutDto> findByFiltros(String ciudad, String ratingG, Boolean activa){
+//
+//
+//        if (ciudad != null && ratingG != null && activa != null) {
+//            Float rating = Float.parseFloat(ratingG);
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudadAndRatingAndActiva(ciudad, rating, activa);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//        if (ratingG != null && activa != null) {
+//            Float rating = Float.parseFloat(ratingG);
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByRatingAndActiva( rating, activa);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//        if (ciudad != null && activa != null) {
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudadAndActiva( ciudad, activa);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//        if (ciudad != null && ratingG != null) {
+//            Float rating = Float.parseFloat(ratingG);
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudadAndRating( ciudad, rating);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//
+//        if (activa != null) {
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByActiva( activa);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//        if (ratingG != null) {
+//            Float rating = Float.parseFloat(ratingG);
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByRating( rating);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//        if (ciudad != null) {
+//            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudad( ciudad);
+//
+//            return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//        }
+//
+//        List<Autoescuela> autoescuelas = autoescuelaRepository.findAll();
+//        return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+//    }
 
 
-        if (ciudad != null && ratingG != null && activa != null) {
-            Float rating = Float.parseFloat(ratingG);
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudadAndRatingAndActiva(ciudad, rating, activa);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+    public List<AutoescuelaOutDto> findByFiltros(String ciudad, Float minRating, Boolean activa) {
 
-            return aod;
-        }
-        if (ratingG != null && activa != null) {
-            Float rating = Float.parseFloat(ratingG);
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByRatingAndActiva( rating, activa);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+        Specification<Autoescuela> spec = Specification
+                .where(AutoescuelaSpecification.ciudadEquals(ciudad))
+                .and(AutoescuelaSpecification.ratingGreater(minRating))
+                .and(AutoescuelaSpecification.activaEquals(activa));
 
-            return aod;
-        }
-        if (ciudad != null && activa != null) {
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudadAndActiva( ciudad, activa);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
+        List<Autoescuela> autoescuelas = autoescuelaRepository.findAll(spec);
 
-            return aod;
-        }
-        if (ciudad != null && ratingG != null) {
-            Float rating = Float.parseFloat(ratingG);
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudadAndRating( ciudad, rating);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
-
-            return aod;
-        }
-
-        if (activa != null) {
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByActiva( activa);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
-
-            return aod;
-        }
-        if (ratingG != null) {
-            Float rating = Float.parseFloat(ratingG);
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByRating( rating);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
-
-            return aod;
-        }
-        if (ciudad != null) {
-            List<Autoescuela> autoescuelas = autoescuelaRepository.findByCiudad( ciudad);
-            List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
-
-            return aod;
-        }
-
-        List<Autoescuela> autoescuelas = autoescuelaRepository.findAll();
-        List<AutoescuelaOutDto> aod = modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
-        return aod;
+        return modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {}.getType());
     }
 
     public AutoescuelaDetailOutDto modify(long id, AutoescuelaInDto autoescuelaInDto) throws AutoescuelaNotFoundException {
@@ -192,40 +200,42 @@ public class AutoescuelaService {
         return modelMapper.map(au, AutoescuelaDetailOutDto.class);
     }
 
-    public List<CocheOutDto> getCoches(Long autoescuelaId){
+    public List<CocheOutDto> getCoches(Long autoescuelaId) throws AutoescuelaNotFoundException {
         List<Coche> coche = cocheRepository.findCochesByAutoescuelaId( autoescuelaId);
         return coche.stream().map(c -> modelMapper.map(c, CocheOutDto.class)).toList();
     }
 
-    public List<MatriculaOutDto> getMatriculas(Long autoescuelaId){
+    public List<MatriculaOutDto> getMatriculas(Long autoescuelaId) throws AutoescuelaNotFoundException {
         List<Matricula> matricula = matriculaRepository.findMatriculaByAutoescuelaId( autoescuelaId);
 
         return matricula.stream().map(m -> modelMapper.map(m, MatriculaOutDto.class)).toList();
     }
 
-    public List<ProfesorOutDto> getProfesores(Long autoescuelaId){
+    public List<ProfesorOutDto> getProfesores(Long autoescuelaId) throws AutoescuelaNotFoundException {
         List<Profesor> profesor = profesorRepository.findProfesoresByAutoescuelaId(autoescuelaId);
              return profesor.stream().map(p -> modelMapper.map(p, ProfesorOutDto.class)).toList();
     }
 
-    public List<MatriculaOutDto> getMatriculasCompletas(Long autoescuelaId){
+    public List<MatriculaOutDto> getMatriculasCompletas(Long autoescuelaId) throws AutoescuelaNotFoundException {
         List<Matricula> matriculas = matriculaRepository.findMatriculaCompletasByAutoescuelaId(autoescuelaId);
 
         return matriculas.stream().map(m -> modelMapper.map(m, MatriculaOutDto.class)).toList();
     }
 
-    public List<AlumnoOutDto> getAlumnosSuspensos(Long autoescuelaId){
+    public List<AlumnoOutDto> getAlumnosSuspensos(Long autoescuelaId) throws AutoescuelaNotFoundException {
         List<Alumno> alumnos = alumnoRepository.findAlumnosSuspensosByAutoescuela(autoescuelaId);
 
         return alumnos.stream().map(a -> modelMapper.map(a, AlumnoOutDto.class)).toList();
     }
 
    public AutoescuelaDetailOutDto patch(Long id, Map<String, Object> patch)
-            throws AutoescuelaNotFoundException {
+           throws AutoescuelaNotFoundException, BadRequestException {
         Autoescuela autoescuela = autoescuelaRepository.findById(id)
                 .orElseThrow(AutoescuelaNotFoundException::new);
 
-        patch.forEach((key, value) -> {
+       for (Map.Entry<String, Object> entry : patch.entrySet()) {
+           String key = entry.getKey();
+           Object value = entry.getValue();
             switch (key) {
                 case "nombre":
                     autoescuela.setNombre((String) value);
@@ -254,8 +264,10 @@ public class AutoescuelaService {
                 case "activa":
                     autoescuela.setActiva((Boolean) value);
                     break;
+                default:
+                    throw new BadRequestException();
             }
-        });
+        };
 
         Autoescuela autoescuelaActualizada = autoescuelaRepository.save(autoescuela);
         return modelMapper.map(autoescuelaActualizada, AutoescuelaDetailOutDto.class);
