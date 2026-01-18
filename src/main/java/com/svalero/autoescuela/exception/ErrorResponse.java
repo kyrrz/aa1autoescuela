@@ -27,6 +27,10 @@ public class ErrorResponse {
     public static ErrorResponse notFound(String message) {
         return new ErrorResponse(404,"not-found", message, new HashMap<>());
     }
+
+    public static ErrorResponse badRequest(String message) {
+        return new ErrorResponse(400,"bad-request", message, new HashMap<>());
+    }
 }
 
 

@@ -6,11 +6,12 @@ import com.svalero.autoescuela.dto.AlumnoOutDto;
 import com.svalero.autoescuela.dto.AutoescuelaDetailOutDto;
 import com.svalero.autoescuela.exception.AlumnoNotFoundException;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
+import com.svalero.autoescuela.exception.BadRequestException;
 import com.svalero.autoescuela.exception.ErrorResponse;
 import com.svalero.autoescuela.service.AlumnoService;
 import com.svalero.autoescuela.service.AutoescuelaService;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,7 @@ public class AlumnoController {
 
     @Autowired
     private AlumnoService alumnoService;
-    @Autowired
-    private ModelMapper modelMapper;
+
     @Autowired
     private AutoescuelaService autoescuelaService;
 
@@ -39,9 +39,9 @@ public class AlumnoController {
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String ciudad,
             @RequestParam(required = false) Boolean usaGafas,
-            @RequestParam(required = false) Float notaTeorico
+            @RequestParam(required = false) Float minNotaTeorico
     ) {
-        List<AlumnoOutDto> alumnoOutDtos = alumnoService.findByFiltros(nombre, ciudad, usaGafas, notaTeorico);
+        List<AlumnoOutDto> alumnoOutDtos = alumnoService.findByFiltros(nombre, ciudad, usaGafas, minNotaTeorico);
         return ResponseEntity.ok(alumnoOutDtos);
     }
 
@@ -76,7 +76,7 @@ public class AlumnoController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AlumnoDetailOutDto> patchAlumno(@RequestBody Map<String, Object> patch, @PathVariable long id) throws AlumnoNotFoundException, AutoescuelaNotFoundException {
+    public ResponseEntity<AlumnoDetailOutDto> patchAlumno(@Valid @RequestBody Map<String, Object> patch, @PathVariable long id) throws AlumnoNotFoundException, AutoescuelaNotFoundException, BadRequestException {
         AlumnoDetailOutDto alumnoDetailOutDto = alumnoService.patch(id, patch);
         return  ResponseEntity.ok(alumnoDetailOutDto);
     }
@@ -104,5 +104,12 @@ public class AlumnoController {
         ErrorResponse errorResponse = ErrorResponse.validationError(errors);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleException(BadRequestException bre){
+        ErrorResponse errorResponse = ErrorResponse.badRequest("Bad request");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
 }

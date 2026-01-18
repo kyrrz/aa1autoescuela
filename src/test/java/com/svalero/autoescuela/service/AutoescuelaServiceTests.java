@@ -4,16 +4,15 @@ import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
 import com.svalero.autoescuela.model.*;
 import com.svalero.autoescuela.repository.*;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.jpa.domain.Specification;
 
-import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -24,14 +23,20 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AutoescuelaServiceTests {
 
+    @InjectMocks
+    private AutoescuelaService autoescuelaService;
+
     @Mock
     private AutoescuelaRepository autoescuelaRepository;
 
     @Mock
-    private ProfesorRepository profesorRepository;
+    private ModelMapper modelMapper;
 
     @Mock
     private CocheRepository cocheRepository;
+
+    @Mock
+    private ProfesorRepository profesorRepository;
 
     @Mock
     private MatriculaRepository matriculaRepository;
@@ -39,477 +44,495 @@ class AutoescuelaServiceTests {
     @Mock
     private AlumnoRepository alumnoRepository;
 
-    @Mock
-    private ModelMapper modelMapper;
 
-    @InjectMocks
-    private AutoescuelaService autoescuelaService;
-
-    private Autoescuela autoescuela;
-    private AutoescuelaInDto autoescuelaInDto;
-    private AutoescuelaOutDto autoescuelaOutDto;
-    private AutoescuelaDetailOutDto autoescuelaDetailOutDto;
-
-    @BeforeEach
-    void setUp() {
-        autoescuela = new Autoescuela();
-        autoescuela.setId(1L);
-        autoescuela.setNombre("Autoescuela Test");
-        autoescuela.setDireccion("Calle Mayor 1");
-        autoescuela.setCiudad("Madrid");
-        autoescuela.setTelefono("912345678");
-        autoescuela.setEmail("test@autoescuela.com");
-        autoescuela.setCapacidad(50);
-        autoescuela.setRating(4.5f);
-        autoescuela.setFechaApertura(LocalDate.of(2020, 1, 1));
-        autoescuela.setActiva(true);
-        autoescuela.setCoches(new ArrayList<>());
-        autoescuela.setProfesores(new ArrayList<>());
-
-        autoescuelaInDto = new AutoescuelaInDto();
-        autoescuelaInDto.setNombre("Autoescuela Test");
-        autoescuelaInDto.setCiudad("Madrid");
-        autoescuelaInDto.setRating(4.5f);
-        autoescuelaInDto.setActiva(true);
-
-        autoescuelaOutDto = new AutoescuelaOutDto();
-        autoescuelaOutDto.setId(1L);
-        autoescuelaOutDto.setNombre("Autoescuela Test");
-        autoescuelaOutDto.setCiudad("Madrid");
-
-        autoescuelaDetailOutDto = new AutoescuelaDetailOutDto();
-        autoescuelaDetailOutDto.setId(1L);
-        autoescuelaDetailOutDto.setNombre("Autoescuela Test");
-        autoescuelaDetailOutDto.setCiudad("Madrid");
-        autoescuelaDetailOutDto.setCoches(new ArrayList<>());
-        autoescuelaDetailOutDto.setProfesores(new ArrayList<>());
-    }
-
-    // ========== TEST ADD ==========
     @Test
-    void testAdd_Success() {
-        when(modelMapper.map(autoescuelaInDto, Autoescuela.class)).thenReturn(autoescuela);
-        when(autoescuelaRepository.save(any(Autoescuela.class))).thenReturn(autoescuela);
-        when(modelMapper.map(autoescuela, AutoescuelaDetailOutDto.class)).thenReturn(autoescuelaDetailOutDto);
+    void testAdd_ok() {
+        AutoescuelaInDto inDto = new AutoescuelaInDto();
+        inDto.setNombre("Autoescuela Test");
 
-        AutoescuelaDetailOutDto result = autoescuelaService.add(autoescuelaInDto);
+        Autoescuela autoescuela = new Autoescuela();
+        Autoescuela savedAutoescuela = new Autoescuela();
+        savedAutoescuela.setId(1L);
+        savedAutoescuela.setNombre("Autoescuela Test");
+
+        AutoescuelaDetailOutDto outDto = new AutoescuelaDetailOutDto();
+        outDto.setId(1L);
+        outDto.setNombre("Autoescuela Test");
+
+        when(modelMapper.map(inDto, Autoescuela.class)).thenReturn(autoescuela);
+        when(autoescuelaRepository.save(autoescuela)).thenReturn(savedAutoescuela);
+        when(modelMapper.map(savedAutoescuela, AutoescuelaDetailOutDto.class)).thenReturn(outDto);
+
+        AutoescuelaDetailOutDto result = autoescuelaService.add(inDto);
 
         assertNotNull(result);
-        assertEquals(autoescuelaDetailOutDto.getId(), result.getId());
-        assertEquals(autoescuelaDetailOutDto.getNombre(), result.getNombre());
-        verify(autoescuelaRepository, times(1)).save(any(Autoescuela.class));
+        assertEquals(1L, result.getId());
+        assertEquals("Autoescuela Test", result.getNombre());
+
+        verify(autoescuelaRepository).save(autoescuela);
     }
 
-    // ========== TEST DELETE ==========
     @Test
-    void testDelete_Success() throws AutoescuelaNotFoundException {
+    void testDelete_ok() throws AutoescuelaNotFoundException {
+        Autoescuela autoescuela = new Autoescuela();
+        autoescuela.setId(1L);
+
         when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuela));
         doNothing().when(autoescuelaRepository).delete(autoescuela);
 
         autoescuelaService.delete(1L);
 
-        verify(autoescuelaRepository, times(1)).findById(1L);
-        verify(autoescuelaRepository, times(1)).delete(autoescuela);
+        verify(autoescuelaRepository).delete(autoescuela);
     }
 
     @Test
-    void testDelete_NotFound() {
-        when(autoescuelaRepository.findById(999L)).thenReturn(Optional.empty());
+    void testDelete_notFound() {
+        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(AutoescuelaNotFoundException.class, () -> {
-            autoescuelaService.delete(999L);
-        });
-        verify(autoescuelaRepository, times(1)).findById(999L);
-        verify(autoescuelaRepository, never()).delete(any(Autoescuela.class));
-    }
-
-    // ========== TEST FIND ALL ==========
-    @Test
-    void testFindAll_Success() {
-        // Given
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-        List<AutoescuelaOutDto> autoescuelasDto = Arrays.asList(autoescuelaOutDto);
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findAll()).thenReturn(autoescuelas);
-        // ✅ Corregido: usar el mismo tipo que el código
-        when(modelMapper.map(eq(autoescuelas), eq(listType))).thenReturn(autoescuelasDto);
-
-        // When
-        List<AutoescuelaOutDto> result = autoescuelaService.findAll();
-
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findAll();
+        assertThrows(AutoescuelaNotFoundException.class, () -> autoescuelaService.delete(1L));
     }
 
     @Test
-    void testFindAll_EmptyList() {
-        List<AutoescuelaOutDto> emptyList = Collections.emptyList();
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findAll()).thenReturn(Collections.emptyList());
-        when(modelMapper.map(eq(Collections.emptyList()), eq(listType))).thenReturn(emptyList);
-
-        List<AutoescuelaOutDto> result = autoescuelaService.findAll();
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(autoescuelaRepository, times(1)).findAll();
-    }
-
-    // ========== TEST FIND BY ID ==========
-    @Test
-    void testFindById_Success() throws AutoescuelaNotFoundException {
-        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuela));
-
-        AutoescuelaDetailOutDto result = autoescuelaService.findById(1L);
-
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Autoescuela Test", result.getNombre());
-        assertEquals("Madrid", result.getCiudad());
-        verify(autoescuelaRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    void testFindById_NotFound() {
-        when(autoescuelaRepository.findById(999L)).thenReturn(Optional.empty());
-
-        assertThrows(AutoescuelaNotFoundException.class, () -> {
-            autoescuelaService.findById(999L);
-        });
-        verify(autoescuelaRepository, times(1)).findById(999L);
-    }
-
-    // ========== TEST FIND ALL BY ID ==========
-    @Test
-    void testFindAllById_Success() {
-        List<Long> ids = Arrays.asList(1L, 2L);
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-
-        when(autoescuelaRepository.findAllById(ids)).thenReturn(autoescuelas);
-
-        List<AutoescuelaDetailOutDto> result = autoescuelaService.findAllById(ids);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findAllById(ids);
-    }
-
-    @Test
-    void testFindAllById_EmptyList() {
-        List<Long> ids = Collections.emptyList();
-        when(autoescuelaRepository.findAllById(ids)).thenReturn(Collections.emptyList());
-
-        List<AutoescuelaDetailOutDto> result = autoescuelaService.findAllById(ids);
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    // ========== TEST MODIFY ==========
-    @Test
-    void testModify_Success() throws AutoescuelaNotFoundException {
-        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuela));
-        // ✅ Corregido: usar doAnswer para que modifique el objeto
-        doAnswer(invocation -> {
-            AutoescuelaInDto source = invocation.getArgument(0);
-            Autoescuela target = invocation.getArgument(1);
-            target.setNombre(source.getNombre());
-            target.setCiudad(source.getCiudad());
-            return null;
-        }).when(modelMapper).map(eq(autoescuelaInDto), eq(autoescuela));
-
-        when(autoescuelaRepository.save(any(Autoescuela.class))).thenReturn(autoescuela);
-        when(modelMapper.map(autoescuela, AutoescuelaDetailOutDto.class)).thenReturn(autoescuelaDetailOutDto);
-
-        AutoescuelaDetailOutDto result = autoescuelaService.modify(1L, autoescuelaInDto);
-
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        verify(autoescuelaRepository, times(1)).findById(1L);
-        verify(autoescuelaRepository, times(1)).save(any(Autoescuela.class));
-    }
-
-    @Test
-    void testModify_NotFound() {
-        when(autoescuelaRepository.findById(999L)).thenReturn(Optional.empty());
-
-        assertThrows(AutoescuelaNotFoundException.class, () -> {
-            autoescuelaService.modify(999L, autoescuelaInDto);
-        });
-        verify(autoescuelaRepository, times(1)).findById(999L);
-        verify(autoescuelaRepository, never()).save(any(Autoescuela.class));
-    }
-
-    // ========== TEST PATCH ==========
-    @Test
-    void testPatch_Success() throws AutoescuelaNotFoundException {
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("nombre", "Autoescuela Actualizada");
-        patch.put("rating", 4.8);
-        patch.put("activa", false);
+    void testFindById_ok() throws AutoescuelaNotFoundException {
+        Autoescuela autoescuela = new Autoescuela();
+        autoescuela.setId(1L);
+        autoescuela.setNombre("Test");
+        autoescuela.setCoches(Collections.emptyList());
+        autoescuela.setProfesores(Collections.emptyList());
 
         when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuela));
-        when(autoescuelaRepository.save(any(Autoescuela.class))).thenReturn(autoescuela);
-        when(modelMapper.map(autoescuela, AutoescuelaDetailOutDto.class)).thenReturn(autoescuelaDetailOutDto);
+        lenient().when(modelMapper.map(any(), eq(CocheOutDto.class))).thenReturn(new CocheOutDto());
+        lenient().when(modelMapper.map(any(), eq(ProfesorOutDto.class))).thenReturn(new ProfesorOutDto());
 
-        AutoescuelaDetailOutDto result = autoescuelaService.patch(1L, patch);
+        AutoescuelaDetailOutDto dto = autoescuelaService.findById(1L);
 
-        assertNotNull(result);
-        verify(autoescuelaRepository, times(1)).findById(1L);
-        verify(autoescuelaRepository, times(1)).save(any(Autoescuela.class));
+        assertNotNull(dto);
+        assertEquals(1L, dto.getId());
+        assertEquals("Test", dto.getNombre());
     }
 
     @Test
-    void testPatch_AllFields() throws AutoescuelaNotFoundException {
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("nombre", "Nueva Autoescuela");
-        patch.put("direccion", "Nueva Direccion");
-        patch.put("ciudad", "Barcelona");
-        patch.put("telefono", "933333333");
-        patch.put("email", "nuevo@email.com");
-        patch.put("capacidad", 100);
-        patch.put("rating", 5.0);
-        patch.put("fechaApertura", "2024-01-01");
-        patch.put("activa", false);
+    void testFindById_notFound() {
+        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuela));
-        when(autoescuelaRepository.save(any(Autoescuela.class))).thenReturn(autoescuela);
-        when(modelMapper.map(autoescuela, AutoescuelaDetailOutDto.class)).thenReturn(autoescuelaDetailOutDto);
-
-        AutoescuelaDetailOutDto result = autoescuelaService.patch(1L, patch);
-
-        assertNotNull(result);
-        verify(autoescuelaRepository, times(1)).save(any(Autoescuela.class));
+        assertThrows(AutoescuelaNotFoundException.class, () -> autoescuelaService.findById(1L));
     }
 
     @Test
-    void testPatch_NotFound() {
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("nombre", "Test");
+    void testFindAll_ok() {
+        List<Autoescuela> autoescuelas = List.of(
+                new Autoescuela(1L, "Autoescuela Test", "Calle 123", "Reus", "911753917", "auto1@gmail.com",
+                        100, 4.5f, LocalDate.of(2010, 1, 2), true, null, null, null, null),
+                new Autoescuela(2L, "Autoescuela Test 2 ", "Calle 1234", "Reus", "911753918", "auto2@gmail.com",
+                        120, 4.1f, LocalDate.of(2010, 1, 1), true, null, null, null, null)
+        );
+        List<AutoescuelaOutDto> modelMapperOut = List.of(
+                new AutoescuelaOutDto(1L, "Autoescuela Test", "Calle 123", "Reus", "911753917", "auto1@gmail.com", 4.5f, true),
+                new AutoescuelaOutDto(2L, "Autoescuela Test 2", "Calle 1234", "Reus", "911753917", "auto1@gmail.com", 4.1f, false)
+        );
 
-        when(autoescuelaRepository.findById(999L)).thenReturn(Optional.empty());
+        when(autoescuelaRepository.findAll(any(Specification.class))).thenReturn(autoescuelas);
 
-        assertThrows(AutoescuelaNotFoundException.class, () -> {
-            autoescuelaService.patch(999L, patch);
-        });
-        verify(autoescuelaRepository, never()).save(any(Autoescuela.class));
-    }
 
-    // ========== TEST FIND BY FILTROS ==========
-    @Test
-    void testFindByFiltros_AllFilters() {
-        String ciudad = "Madrid";
-        String rating = "4.5";
-        Boolean activa = true;
-
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-        List<AutoescuelaOutDto> autoescuelasDto = Arrays.asList(autoescuelaOutDto);
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findByCiudadAndRatingAndActiva(ciudad, 4.5f, activa))
-                .thenReturn(autoescuelas);
-        // ✅ Corregido: usar eq() con los argumentos correctos
-        when(modelMapper.map(eq(autoescuelas), eq(listType))).thenReturn(autoescuelasDto);
-
-        List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros(ciudad, rating, activa);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findByCiudadAndRatingAndActiva(ciudad, 4.5f, activa);
-    }
-
-    @Test
-    void testFindByFiltros_OnlyCiudad() {
-        String ciudad = "Madrid";
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-        List<AutoescuelaOutDto> autoescuelasDto = Arrays.asList(autoescuelaOutDto);
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findByCiudad(ciudad)).thenReturn(autoescuelas);
-        when(modelMapper.map(eq(autoescuelas), eq(listType))).thenReturn(autoescuelasDto);
-
-        List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros(ciudad, null, null);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findByCiudad(ciudad);
-    }
-
-    @Test
-    void testFindByFiltros_OnlyRating() {
-        String rating = "4.5";
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-        List<AutoescuelaOutDto> autoescuelasDto = Arrays.asList(autoescuelaOutDto);
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findByRating(4.5f)).thenReturn(autoescuelas);
-        when(modelMapper.map(eq(autoescuelas), eq(listType))).thenReturn(autoescuelasDto);
-
-        List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros(null, rating, null);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findByRating(4.5f);
-    }
-
-    @Test
-    void testFindByFiltros_OnlyActiva() {
-        Boolean activa = true;
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-        List<AutoescuelaOutDto> autoescuelasDto = Arrays.asList(autoescuelaOutDto);
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findByActiva(activa)).thenReturn(autoescuelas);
-        when(modelMapper.map(eq(autoescuelas), eq(listType))).thenReturn(autoescuelasDto);
-
-        List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros(null, null, activa);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findByActiva(activa);
-    }
-
-    @Test
-    void testFindByFiltros_NoFilters() {
-        List<Autoescuela> autoescuelas = Arrays.asList(autoescuela);
-        List<AutoescuelaOutDto> autoescuelasDto = Arrays.asList(autoescuelaOutDto);
-        Type listType = new TypeToken<List<AutoescuelaOutDto>>() {}.getType();
-
-        when(autoescuelaRepository.findAll()).thenReturn(autoescuelas);
-        when(modelMapper.map(eq(autoescuelas), eq(listType))).thenReturn(autoescuelasDto);
+        when(modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>() {
+        }.getType()))
+                .thenReturn(modelMapperOut);
 
         List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros(null, null, null);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(autoescuelaRepository, times(1)).findAll();
+        assertEquals(2, result.size());
+        assertEquals("Reus", result.getFirst().getCiudad());
+        assertEquals(4.5f, result.getFirst().getRating());
+        assertEquals("Autoescuela Test 2", result.getLast().getNombre());
+        assertTrue(result.getFirst().isActiva());
+
+        verify(autoescuelaRepository, times(1)).findAll(any(Specification.class));
     }
 
-    // ========== TEST GET COCHES ==========
     @Test
-    void testGetCoches_Success() {
-        Coche coche = new Coche();
-        coche.setId(1L);
-        coche.setModelo("Deportivo");
+    void testFindByFiltros_ok() {
+        List<Autoescuela> autoescuelas = List.of(
+                new Autoescuela(1L, "Autoescuela Test", "Calle 123", "Reus", "911753917", "auto1@gmail.com",
+                        100, 4.5f, LocalDate.of(2010, 1, 2),true,null,null,null,null),
+                new Autoescuela(2L, "Autoescuela Test 2 ", "Calle 1234", "Reus", "911753917", "auto1@gmail.com",
+                100, 4.1f, LocalDate.of(2010, 1, 2),true,null,null,null,null)
+        );
+        List<AutoescuelaOutDto> modelMapperOut = List.of(
+                new AutoescuelaOutDto(1L, "Autoescuela Test", "Calle 123", "Reus", "911753917", "auto1@gmail.com", 4.5f,true)
+        );
 
-        CocheOutDto cocheDto = new CocheOutDto();
-        cocheDto.setId(1L);
-        cocheDto.setModelo("Deportivo");
+        when(autoescuelaRepository.findAll(any(Specification.class))).thenReturn(autoescuelas);
 
-        List<Coche> coches = Arrays.asList(coche);
+        when(modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>(){}.getType()))
+                .thenReturn(modelMapperOut);
+
+        List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros("Reus", 4.5f, true);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Reus", result.getFirst().getCiudad());
+        assertEquals(4.5f, result.getFirst().getRating());
+        assertTrue(result.getFirst().isActiva());
+
+        verify(autoescuelaRepository, times(1)).findAll(any(Specification.class));
+    }
+
+    @Test
+    void testFindByFiltros_ratingFilter() {
+        Autoescuela a = new Autoescuela();
+        a.setId(1L);
+        a.setCiudad("Madrid");
+        a.setRating(7.2f);
+        a.setActiva(true);
+
+        List<Autoescuela> autoescuelas = List.of(a);
+        List<AutoescuelaOutDto> dtos = List.of(new AutoescuelaOutDto());
+
+        when(autoescuelaRepository.findAll(any(Specification.class))).thenReturn(autoescuelas);
+        when(modelMapper.map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>(){}.getType())).thenReturn(dtos);
+
+        List<AutoescuelaOutDto> result = autoescuelaService.findByFiltros(null, 7.5f, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        verify(autoescuelaRepository, times(1)).findAll(any(Specification.class));
+        verify(modelMapper, times(1)).map(autoescuelas, new TypeToken<List<AutoescuelaOutDto>>(){}.getType());
+    }
+
+    @Test
+    void testModify_ok() throws AutoescuelaNotFoundException {
+        AutoescuelaInDto inDto = new AutoescuelaInDto();
+        inDto.setNombre("Modificado");
+
+        Autoescuela autoescuelaExistente = new Autoescuela();
+        autoescuelaExistente.setId(1L);
+
+        Autoescuela autoescuelaModificada = new Autoescuela();
+        autoescuelaModificada.setId(1L);
+        autoescuelaModificada.setNombre("Modificado");
+
+        AutoescuelaDetailOutDto outDto = new AutoescuelaDetailOutDto();
+        outDto.setId(1L);
+        outDto.setNombre("Modificado");
+
+        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuelaExistente));
+        doAnswer(invocation -> {
+            AutoescuelaInDto source = invocation.getArgument(0);
+            Autoescuela destination = invocation.getArgument(1);
+            destination.setNombre(source.getNombre());
+            return null;
+        }).when(modelMapper).map(inDto, autoescuelaExistente);
+
+        when(autoescuelaRepository.save(autoescuelaExistente)).thenReturn(autoescuelaModificada);
+        when(modelMapper.map(autoescuelaModificada, AutoescuelaDetailOutDto.class)).thenReturn(outDto);
+
+        AutoescuelaDetailOutDto result = autoescuelaService.modify(1L, inDto);
+
+        assertNotNull(result);
+        assertEquals("Modificado", result.getNombre());
+        assertEquals(1L, result.getId());
+    }
+
+    @Test
+    void testModify_notFound() {
+        AutoescuelaInDto inDto = new AutoescuelaInDto();
+        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(AutoescuelaNotFoundException.class, () -> autoescuelaService.modify(1L, inDto));
+    }
+
+    @Test
+    void testPatch_ok() throws AutoescuelaNotFoundException, com.svalero.autoescuela.exception.BadRequestException {
+        Autoescuela autoescuela = new Autoescuela();
+        autoescuela.setId(1L);
+        autoescuela.setNombre("Nombre Original");
+        autoescuela.setDireccion("Dir Original");
+        autoescuela.setCiudad("Ciudad Original");
+        autoescuela.setTelefono("123");
+        autoescuela.setEmail("email@old.com");
+        autoescuela.setCapacidad(50);
+        autoescuela.setRating(3.5f);
+        autoescuela.setFechaApertura(LocalDate.of(2020,1,1));
+        autoescuela.setActiva(true);
+
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("nombre", "Nuevo Nombre");
+        patch.put("capacidad", 100);
+        patch.put("activa", false);
+        patch.put("fechaApertura", "2023-01-01");
+
+        Autoescuela autoescuelaActualizada = new Autoescuela();
+        autoescuelaActualizada.setId(1L);
+        autoescuelaActualizada.setNombre("Nuevo Nombre");
+        autoescuelaActualizada.setCapacidad(100);
+        autoescuelaActualizada.setActiva(false);
+        autoescuelaActualizada.setFechaApertura(LocalDate.of(2023, 1, 1));
+
+        AutoescuelaDetailOutDto outDto = new AutoescuelaDetailOutDto();
+        outDto.setId(1L);
+        outDto.setNombre("Nuevo Nombre");
+        outDto.setActiva(false);
+
+
+        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.of(autoescuela));
+        when(autoescuelaRepository.save(any(Autoescuela.class))).thenReturn(autoescuelaActualizada);
+        when(modelMapper.map(autoescuelaActualizada, AutoescuelaDetailOutDto.class)).thenReturn(outDto);
+
+        AutoescuelaDetailOutDto result = autoescuelaService.patch(1L, patch);
+
+        assertNotNull(result);
+        assertEquals("Nuevo Nombre", result.getNombre());
+        assertFalse(result.isActiva());
+    }
+
+    @Test
+    void testPatch_notFound() {
+        when(autoescuelaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(AutoescuelaNotFoundException.class, () -> autoescuelaService.patch(1L, Map.of("nombre", "test")));
+    }
+
+    @Test
+    void testGetCoches_ok() throws AutoescuelaNotFoundException {
+
+
+        Coche coche1 = new Coche();
+        coche1.setId(1L);
+        coche1.setMarca("FIAT");
+        coche1.setMatricula("1234FCB");
+
+        Coche coche2 = new Coche();
+        coche2.setId(2L);
+        coche2.setMarca("SEAT");
+        coche2.setMatricula("5678DBF");
+
+        List<Coche> coches = Arrays.asList(coche1, coche2);
+
+        CocheOutDto cocheOutDto1 = new CocheOutDto();
+        cocheOutDto1.setId(1L);
+        cocheOutDto1.setMarca("FIAT");
+
+        CocheOutDto cocheOutDto2 = new CocheOutDto();
+        cocheOutDto2.setId(2L);
+        cocheOutDto2.setMarca("SEAT");
 
         when(cocheRepository.findCochesByAutoescuelaId(1L)).thenReturn(coches);
-        when(modelMapper.map(coche, CocheOutDto.class)).thenReturn(cocheDto);
+        when(modelMapper.map(coche1, CocheOutDto.class)).thenReturn(cocheOutDto1);
+        when(modelMapper.map(coche2, CocheOutDto.class)).thenReturn(cocheOutDto2);
 
         List<CocheOutDto> result = autoescuelaService.getCoches(1L);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Deportivo", result.get(0).getModelo());
+        assertEquals(2, result.size());
+        assertEquals("FIAT", result.get(0).getMarca());
+        assertEquals("SEAT", result.get(1).getMarca());
+
         verify(cocheRepository, times(1)).findCochesByAutoescuelaId(1L);
+        verify(modelMapper, times(2)).map(any(Coche.class), eq(CocheOutDto.class));
     }
 
     @Test
-    void testGetCoches_EmptyList() {
+    void getCoches_vacio() throws AutoescuelaNotFoundException {
+
         when(cocheRepository.findCochesByAutoescuelaId(1L)).thenReturn(Collections.emptyList());
 
         List<CocheOutDto> result = autoescuelaService.getCoches(1L);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
+
+        verify(cocheRepository, times(1)).findCochesByAutoescuelaId(1L);
+        verify(modelMapper, never()).map(any(Coche.class), eq(CocheOutDto.class));
     }
 
-    // ========== TEST GET MATRICULAS ==========
     @Test
-    void testGetMatriculas_Success() {
-        Matricula matricula = new Matricula();
-        matricula.setId(1L);
+    void getMatriculaso_k() throws AutoescuelaNotFoundException {
+        // Given
+        Matricula matricula1 = new Matricula();
+        matricula1.setId(1L);
 
-        MatriculaOutDto matriculaDto = new MatriculaOutDto();
-        matriculaDto.setId(1L);
+        Matricula matricula2 = new Matricula();
+        matricula2.setId(2L);
 
-        List<Matricula> matriculas = Arrays.asList(matricula);
+        List<Matricula> matriculas = Arrays.asList(matricula1, matricula2);
+
+        MatriculaOutDto matriculaOutDto1 = new MatriculaOutDto();
+        matriculaOutDto1.setId(1L);
+
+        MatriculaOutDto matriculaOutDto2 = new MatriculaOutDto();
+        matriculaOutDto2.setId(2L);
 
         when(matriculaRepository.findMatriculaByAutoescuelaId(1L)).thenReturn(matriculas);
-        when(modelMapper.map(matricula, MatriculaOutDto.class)).thenReturn(matriculaDto);
+        when(modelMapper.map(matricula1, MatriculaOutDto.class)).thenReturn(matriculaOutDto1);
+        when(modelMapper.map(matricula2, MatriculaOutDto.class)).thenReturn(matriculaOutDto2);
 
         List<MatriculaOutDto> result = autoescuelaService.getMatriculas(1L);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+
         verify(matriculaRepository, times(1)).findMatriculaByAutoescuelaId(1L);
+        verify(modelMapper, times(2)).map(any(Matricula.class), eq(MatriculaOutDto.class));
     }
 
-    // ========== TEST GET PROFESORES ==========
     @Test
-    void testGetProfesores_Success() {
-        Profesor profesor = new Profesor();
-        profesor.setId(1L);
-        profesor.setNombre("Carlos");
+    void getMatriculas_vacio() throws AutoescuelaNotFoundException {
+        when(matriculaRepository.findMatriculaByAutoescuelaId(1L)).thenReturn(Collections.emptyList());
 
-        ProfesorOutDto profesorDto = new ProfesorOutDto();
-        profesorDto.setId(1L);
-        profesorDto.setNombre("Carlos");
+        List<MatriculaOutDto> result = autoescuelaService.getMatriculas(1L);
 
-        List<Profesor> profesores = Arrays.asList(profesor);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(matriculaRepository, times(1)).findMatriculaByAutoescuelaId(1L);
+        verify(modelMapper, never()).map(any(Matricula.class), eq(MatriculaOutDto.class));
+    }
+
+    @Test
+    void getProfesores_ok() throws AutoescuelaNotFoundException {
+
+        Profesor profesor1 = new Profesor();
+        profesor1.setId(1L);
+        profesor1.setNombre("Juan");
+
+        Profesor profesor2 = new Profesor();
+        profesor2.setId(2L);
+        profesor2.setNombre("María");
+
+        List<Profesor> profesores = Arrays.asList(profesor1, profesor2);
+
+        ProfesorOutDto profesorOutDto1 = new ProfesorOutDto();
+        profesorOutDto1.setId(1L);
+        profesorOutDto1.setNombre("Juan");
+
+        ProfesorOutDto profesorOutDto2 = new ProfesorOutDto();
+        profesorOutDto2.setId(2L);
+        profesorOutDto2.setNombre("María");
 
         when(profesorRepository.findProfesoresByAutoescuelaId(1L)).thenReturn(profesores);
-        when(modelMapper.map(profesor, ProfesorOutDto.class)).thenReturn(profesorDto);
+        when(modelMapper.map(profesor1, ProfesorOutDto.class)).thenReturn(profesorOutDto1);
+        when(modelMapper.map(profesor2, ProfesorOutDto.class)).thenReturn(profesorOutDto2);
 
         List<ProfesorOutDto> result = autoescuelaService.getProfesores(1L);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Carlos", result.get(0).getNombre());
+        assertEquals(2, result.size());
+        assertEquals("Juan", result.get(0).getNombre());
+        assertEquals("María", result.get(1).getNombre());
+
         verify(profesorRepository, times(1)).findProfesoresByAutoescuelaId(1L);
+        verify(modelMapper, times(2)).map(any(Profesor.class), eq(ProfesorOutDto.class));
     }
 
-    // ========== TEST GET MATRICULAS COMPLETAS ==========
     @Test
-    void testGetMatriculasCompletas_Success() {
-        Matricula matricula = new Matricula();
-        matricula.setId(1L);
+    void getProfesores_vacia() throws AutoescuelaNotFoundException {
+        when(profesorRepository.findProfesoresByAutoescuelaId(1L)).thenReturn(Collections.emptyList());
 
-        MatriculaOutDto matriculaDto = new MatriculaOutDto();
-        matriculaDto.setId(1L);
+        List<ProfesorOutDto> result = autoescuelaService.getProfesores(1L);
 
-        List<Matricula> matriculas = Arrays.asList(matricula);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(profesorRepository, times(1)).findProfesoresByAutoescuelaId(1L);
+        verify(modelMapper, never()).map(any(Profesor.class), eq(ProfesorOutDto.class));
+    }
+
+    @Test
+    void getMatriculasCompletada_ok() throws AutoescuelaNotFoundException {
+        Matricula matricula1 = new Matricula();
+        matricula1.setId(1L);
+        matricula1.setCompletada(true);
+
+        Matricula matricula2 = new Matricula();
+        matricula2.setId(2L);
+        matricula2.setCompletada(true);
+
+        List<Matricula> matriculas = Arrays.asList(matricula1, matricula2);
+
+        MatriculaOutDto matriculaOutDto1 = new MatriculaOutDto();
+        matriculaOutDto1.setId(1L);
+
+        MatriculaOutDto matriculaOutDto2 = new MatriculaOutDto();
+        matriculaOutDto2.setId(2L);
 
         when(matriculaRepository.findMatriculaCompletasByAutoescuelaId(1L)).thenReturn(matriculas);
-        when(modelMapper.map(matricula, MatriculaOutDto.class)).thenReturn(matriculaDto);
+        when(modelMapper.map(matricula1, MatriculaOutDto.class)).thenReturn(matriculaOutDto1);
+        when(modelMapper.map(matricula2, MatriculaOutDto.class)).thenReturn(matriculaOutDto2);
 
         List<MatriculaOutDto> result = autoescuelaService.getMatriculasCompletas(1L);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
+
         verify(matriculaRepository, times(1)).findMatriculaCompletasByAutoescuelaId(1L);
+        verify(modelMapper, times(2)).map(any(Matricula.class), eq(MatriculaOutDto.class));
     }
 
-    // ========== TEST GET ALUMNOS SUSPENSOS ==========
     @Test
-    void testGetAlumnosSuspensos_Success() {
-        Alumno alumno = new Alumno();
-        alumno.setId(1L);
-        alumno.setNombre("Juan");
+    void getMatriculasCompletas_vacio() throws AutoescuelaNotFoundException {
+        when(matriculaRepository.findMatriculaCompletasByAutoescuelaId(1L)).thenReturn(Collections.emptyList());
 
-        AlumnoOutDto alumnoDto = new AlumnoOutDto();
-        alumnoDto.setId(1L);
-        alumnoDto.setNombre("Juan");
+        List<MatriculaOutDto> result = autoescuelaService.getMatriculasCompletas(1L);
 
-        List<Alumno> alumnos = Arrays.asList(alumno);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(matriculaRepository, times(1)).findMatriculaCompletasByAutoescuelaId(1L);
+        verify(modelMapper, never()).map(any(Matricula.class), eq(MatriculaOutDto.class));
+    }
+
+    @Test
+    void getAlumnosSuspensos_DeberiaRetornarListaDeAlumnosSuspensos_CuandoExisten() throws AutoescuelaNotFoundException {
+        Alumno alumno1 = new Alumno();
+        alumno1.setId(1L);
+        alumno1.setNombre("Pedro");
+
+        Alumno alumno2 = new Alumno();
+        alumno2.setId(2L);
+        alumno2.setNombre("Ana");
+
+        List<Alumno> alumnos = Arrays.asList(alumno1, alumno2);
+
+        AlumnoOutDto alumnoOutDto1 = new AlumnoOutDto();
+        alumnoOutDto1.setId(1L);
+        alumnoOutDto1.setNombre("Pedro");
+
+        AlumnoOutDto alumnoOutDto2 = new AlumnoOutDto();
+        alumnoOutDto2.setId(2L);
+        alumnoOutDto2.setNombre("Ana");
 
         when(alumnoRepository.findAlumnosSuspensosByAutoescuela(1L)).thenReturn(alumnos);
-        when(modelMapper.map(alumno, AlumnoOutDto.class)).thenReturn(alumnoDto);
+        when(modelMapper.map(alumno1, AlumnoOutDto.class)).thenReturn(alumnoOutDto1);
+        when(modelMapper.map(alumno2, AlumnoOutDto.class)).thenReturn(alumnoOutDto2);
 
         List<AlumnoOutDto> result = autoescuelaService.getAlumnosSuspensos(1L);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Juan", result.get(0).getNombre());
+        assertEquals(2, result.size());
+        assertEquals("Pedro", result.get(0).getNombre());
+        assertEquals("Ana", result.get(1).getNombre());
+
         verify(alumnoRepository, times(1)).findAlumnosSuspensosByAutoescuela(1L);
+        verify(modelMapper, times(2)).map(any(Alumno.class), eq(AlumnoOutDto.class));
     }
+    @Test
+    void getAlumnosSuspensos_vacio() throws AutoescuelaNotFoundException {
+        when(alumnoRepository.findAlumnosSuspensosByAutoescuela(1L)).thenReturn(Collections.emptyList());
+
+        List<AlumnoOutDto> result = autoescuelaService.getAlumnosSuspensos(1L);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(alumnoRepository, times(1)).findAlumnosSuspensosByAutoescuela(1L);
+        verify(modelMapper, never()).map(any(Alumno.class), eq(AlumnoOutDto.class));
+    }
+
+
+
+
 }

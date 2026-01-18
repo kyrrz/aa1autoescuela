@@ -27,11 +27,11 @@ public class AutoescuelaController {
     @GetMapping("")
     public ResponseEntity<List<AutoescuelaOutDto>> getAll(
             @RequestParam(required = false) String ciudad,
-            @RequestParam(required = false) String ratingG,
+            @RequestParam(required = false) Float minRating,
             @RequestParam(required = false) Boolean activa
     ) {
 
-        List<AutoescuelaOutDto> autoescuelaOutDtos = autoescuelaService.findByFiltros(ciudad, ratingG, activa);
+        List<AutoescuelaOutDto> autoescuelaOutDtos = autoescuelaService.findByFiltros(ciudad, minRating, activa);
         return ResponseEntity.ok(autoescuelaOutDtos);
     }
 
@@ -41,14 +41,14 @@ public class AutoescuelaController {
     }
 
     @GetMapping("/{id}/profesores")
-    public ResponseEntity<List<ProfesorOutDto>> getProfesoresByAutoescuelaId(@PathVariable long id) {
+    public ResponseEntity<List<ProfesorOutDto>> getProfesoresByAutoescuelaId(@PathVariable long id) throws AutoescuelaNotFoundException {
         List<ProfesorOutDto> profesores = autoescuelaService.getProfesores(id);
 
         return ResponseEntity.ok(profesores);
     }
 
     @GetMapping("/{id}/coches")
-    public ResponseEntity<List<CocheOutDto>> getCochesByAutoescuelaId(@PathVariable long id) {
+    public ResponseEntity<List<CocheOutDto>> getCochesByAutoescuelaId(@PathVariable long id) throws AutoescuelaNotFoundException {
         List<CocheOutDto> coches = autoescuelaService.getCoches(id);
 
         return ResponseEntity.ok(coches);
@@ -69,7 +69,7 @@ public class AutoescuelaController {
         );
     }
     @GetMapping("/{id}/alumnos/suspensos")
-    public ResponseEntity<List<AlumnoOutDto>> getAlumnosSuspensosByAutoescuelaId(@PathVariable long id)  {
+    public ResponseEntity<List<AlumnoOutDto>> getAlumnosSuspensosByAutoescuelaId(@PathVariable long id) throws AutoescuelaNotFoundException {
         return ResponseEntity.ok(autoescuelaService.getAlumnosSuspensos(id));
     }
 
@@ -95,7 +95,7 @@ public class AutoescuelaController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AutoescuelaDetailOutDto> patchAutoescuela(@PathVariable Long id, @RequestBody Map<String, Object> patch) throws AutoescuelaNotFoundException {
+    public ResponseEntity<AutoescuelaDetailOutDto> patchAutoescuela(@Valid @PathVariable Long id, @RequestBody Map<String, Object> patch) throws AutoescuelaNotFoundException, BadRequestException {
         AutoescuelaDetailOutDto autoescuelaPatch = autoescuelaService.patch(id, patch);
         return ResponseEntity.ok(autoescuelaPatch);
     }
@@ -116,6 +116,12 @@ public class AutoescuelaController {
             errors.put(fieldName,message);
         });
         ErrorResponse errorResponse = ErrorResponse.validationError(errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleException(BadRequestException bre){
+        ErrorResponse errorResponse = ErrorResponse.badRequest("Bad request");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

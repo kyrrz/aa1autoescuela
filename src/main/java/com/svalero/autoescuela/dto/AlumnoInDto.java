@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 

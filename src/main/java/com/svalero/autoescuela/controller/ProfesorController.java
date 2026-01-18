@@ -3,6 +3,7 @@ package com.svalero.autoescuela.controller;
 
 import com.svalero.autoescuela.dto.*;
 import com.svalero.autoescuela.exception.AutoescuelaNotFoundException;
+import com.svalero.autoescuela.exception.BadRequestException;
 import com.svalero.autoescuela.exception.ErrorResponse;
 import com.svalero.autoescuela.exception.ProfesorNotFoundException;
 import com.svalero.autoescuela.service.AutoescuelaService;
@@ -45,7 +46,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/{id}/autoescuelas")
-    public ResponseEntity<List<AutoescuelaOutDto>> getAutoescuelaByProfesorId(@PathVariable long id){
+    public ResponseEntity<List<AutoescuelaOutDto>> getAutoescuelaByProfesorId(@PathVariable long id) throws ProfesorNotFoundException {
 
         return ResponseEntity.ok(profesorService.getAutoescuelas(id));
     }
@@ -103,6 +104,12 @@ public class ProfesorController {
             errors.put(fieldName,message);
         });
         ErrorResponse errorResponse = ErrorResponse.validationError(errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleException(BadRequestException bre){
+        ErrorResponse errorResponse = ErrorResponse.badRequest("Bad request");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

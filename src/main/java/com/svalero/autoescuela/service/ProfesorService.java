@@ -7,9 +7,11 @@ import com.svalero.autoescuela.model.Autoescuela;
 import com.svalero.autoescuela.model.Profesor;
 import com.svalero.autoescuela.repository.AutoescuelaRepository;
 import com.svalero.autoescuela.repository.ProfesorRepository;
+import com.svalero.autoescuela.specification.ProfesorSpecification;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
@@ -63,61 +65,73 @@ public class ProfesorService {
         return profesorRepository.findAll();
     }
 
-    public List<AutoescuelaOutDto> getAutoescuelas(Long profesorId) {
+    public List<AutoescuelaOutDto> getAutoescuelas(Long profesorId) throws ProfesorNotFoundException {
         List<Autoescuela> autoescuela = autoescuelaRepository.findAutoescuelasByProfesorId(profesorId);
 
         return autoescuela.stream().map(a -> modelMapper.map(a, AutoescuelaOutDto.class)).toList();
     }
-    public List<ProfesorOutDto> findByFilters(String nombre, String especialidad, Boolean activo){
+//    public List<ProfesorOutDto> findByFilters(String nombre, String especialidad, Boolean activo){
+//
+//        if (nombre != null && especialidad != null && activo != null) {
+//            List<Profesor> profesors = profesorRepository.findByNombreAndEspecialidadAndActivo(nombre, especialidad, activo);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//        if ( especialidad != null && activo != null) {
+//            List<Profesor> profesors = profesorRepository.findByActivoAndEspecialidad(activo, especialidad);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//        if ( nombre != null && activo != null) {
+//            List<Profesor> profesors = profesorRepository.findByNombreAndActivo(nombre, activo);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//        if ( nombre != null && especialidad != null) {
+//            List<Profesor> profesors = profesorRepository.findByNombreAndEspecialidad(nombre, especialidad);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//
+//        if ( activo != null ) {
+//            List<Profesor> profesors = profesorRepository.findByActivo(activo);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//        if ( nombre != null ) {
+//            List<Profesor> profesors = profesorRepository.findByNombre(nombre);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//        if ( especialidad != null ) {
+//            List<Profesor> profesors = profesorRepository.findByEspecialidad(especialidad);
+//            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//            return profesorsDto;
+//        }
+//
+//        List<Profesor> profesors = profesorRepository.findAll();
+//        List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+//
+//        return profesorsDto;
+//    }
 
-        if (nombre != null && especialidad != null && activo != null) {
-            List<Profesor> profesors = profesorRepository.findByNombreAndEspecialidadAndActivo(nombre, especialidad, activo);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
 
-            return profesorsDto;
-        }
-        if ( especialidad != null && activo != null) {
-            List<Profesor> profesors = profesorRepository.findByActivoAndEspecialidad(activo, especialidad);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+    public List<ProfesorOutDto> findByFilters(String nombre, String especialidad, Boolean activo) {
+        Specification<Profesor> spec = Specification
+                .where(ProfesorSpecification.nombreEquals(nombre))
+                .and(ProfesorSpecification.especialidadEquals(especialidad))
+                .and(ProfesorSpecification.activoEquals(activo));
 
-            return profesorsDto;
-        }
-        if ( nombre != null && activo != null) {
-            List<Profesor> profesors = profesorRepository.findByNombreAndActivo(nombre, activo);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
+        List<Profesor> profesores = profesorRepository.findAll(spec);
 
-            return profesorsDto;
-        }
-        if ( nombre != null && especialidad != null) {
-            List<Profesor> profesors = profesorRepository.findByNombreAndEspecialidad(nombre, especialidad);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
-
-            return profesorsDto;
-        }
-
-        if ( activo != null ) {
-            List<Profesor> profesors = profesorRepository.findByActivo(activo);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
-
-            return profesorsDto;
-        }
-        if ( nombre != null ) {
-            List<Profesor> profesors = profesorRepository.findByNombre(nombre);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
-
-            return profesorsDto;
-        }
-        if ( especialidad != null ) {
-            List<Profesor> profesors = profesorRepository.findByEspecialidad(especialidad);
-            List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
-
-            return profesorsDto;
-        }
-
-        List<Profesor> profesors = profesorRepository.findAll();
-        List<ProfesorOutDto> profesorsDto = modelMapper.map(profesors, new TypeToken<List<ProfesorOutDto>>() {}.getType());
-
-        return profesorsDto;
+        return modelMapper.map(profesores, new TypeToken<List<ProfesorOutDto>>() {}.getType());
     }
 
     public ProfesorDetailOutDto findById(long id) throws ProfesorNotFoundException{
@@ -156,7 +170,9 @@ public class ProfesorService {
         Profesor profesor = profesorRepository.findById(id)
                 .orElseThrow(ProfesorNotFoundException::new);
 
-        patch.forEach((key, value) -> {
+        for (Map.Entry<String, Object> entry : patch.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
             switch (key) {
                 case "nombre":
                     profesor.setNombre((String) value);
@@ -195,7 +211,7 @@ public class ProfesorService {
                     profesor.setAutoescuelas(autoescuelas);
                     break;
             }
-        });
+        };
 
         Profesor profesorActualizado = profesorRepository.save(profesor);
         return modelMapper.map(profesorActualizado, ProfesorDetailOutDto.class);
