@@ -49,6 +49,12 @@ Y se puede ver que no hay ningun problema con los tests.
 
 ### 4 Ficheros adicionales
 
-En este repositorio también existe el fichero OpenAPI 3.0 llamado autoescuela.yaml
+
+En este repositorio también existe el fichero OpenAPI 3.0 llamado autoescuela.yaml.
+
+También está el proyecto Wiremock, que Mockea el CRUD de nuestra API, sin el metodo PATCH ni los ENDPOINTS COMPUESTOS
+pero usando todos los casos de error.
+
+Añadidos las dos colecciones Postman, la de la API real y la de WireMock
 
 
