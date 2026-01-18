@@ -1,0 +1,1196 @@
+{
+  "info": {
+    "_postman_id": "03255eb8-f630-47ec-a0ba-092a68b9977d",
+    "name": "AA1_Autoescuela WireMock",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44950745",
+    "_collection_link": "https://go.postman.co/collection/44950745-03255eb8-f630-47ec-a0ba-092a68b9977d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Alumno",
+      "item": [
+        {
+          "name": "/alumnos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/alumnos",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos/id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/alumnos/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos/id (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/alumnos/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (ok)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Pedro\",\r\n  \"apellidos\": \"Test\",\r\n  \"dni\": \"12345578A\",\r\n  \"fechaNacimiento\": \"2022-06-16\",\r\n  \"telefono\": \"633839069\",\r\n  \"email\": \"a.reyes@gmail.com\",\r\n  \"direccion\": \"Calle Mayor 123\",\r\n  \"ciudad\": \"Madrid\",\r\n  \"usaGafas\": true,\r\n  \"notaTeorico\": 4,\r\n  \"autoescuelaId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/alumnos",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Pedro\",\r\n  \"apellidos\": \"Test\",\r\n  \"dni\": \"12345578A\",\r\n  \"fechaNacimiento\": \"2022-06-16\",\r\n  \"telefono\": \"633839069\",\r\n  \"email\": \"a.reyes@gmail.com\",\r\n  \"direccion\": \"Calle Mayor 123\",\r\n  \"ciudad\": \"Madrid\",\r\n  \"usaGafas\": true,\r\n  \"notaTeorico\": 4,\r\n  \"autoescuelaId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/alumnos",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (ok)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Alvaro\",\r\n    \"apellidos\": \"Reyes de Diego\",\r\n    \"email\": \"a.reyes@gmail.com\",\r\n    \"telefono\": \"633839069\",\r\n    \"direccion\": \"Calle Mayor 123\",\r\n    \"ciudad\": \"Reus\",\r\n    \"dni\": \"12345678A\",\r\n    \"fechaNacimiento\": \"1922-06-16\",\r\n    \"usaGafas\": true,\r\n    \"notaTeorico\": 8.5,\r\n    \"autoescuelaId\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/alumnos/3",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (404)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Alvaro\",\r\n    \"apellidos\": \"Parker\",\r\n    \"email\": \"a.reyes@gmail.com\",\r\n    \"telefono\": \"633839069\",\r\n    \"direccion\": \"Calle Mayor 123\",\r\n    \"ciudad\": \"Reus\",\r\n    \"dni\": \"12345678A\",\r\n    \"fechaNacimiento\": \"1922-06-16\",\r\n    \"usaGafas\": true,\r\n    \"notaTeorico\": 8.5,\r\n    \"autoescuelaId\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/alumnos/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (400)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Alvaro\",\r\n    \"apellidos\": \"Parker\",\r\n    \"email\": \"a.reyes@gmail.com\",\r\n    \"telefono\": \"633839069\",\r\n    \"direccion\": \"Calle Mayor 123\",\r\n    \"ciudad\": \"Reus\",\r\n    \"dni\": \"12345678A\",\r\n    \"fechaNacimiento\": \"1922-06-16\",\r\n    \"usaGafas\": true,\r\n    \"notaTeorico\": 8.5,\r\n    \"autoescuelaId\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/alumnos/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (ok)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/alumnos/7",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/alumnos (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/alumnos/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "alumnos",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Autoescuela",
+      "item": [
+        {
+          "name": "/autoescuelas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/autoescuelas",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (ok)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/autoescuelas/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/autoescuelas/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas (ok)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Autoescuela Svalero 9\",\r\n  \"direccion\": \"Avenida Diagonal 123\",\r\n  \"ciudad\": \"Zaragoza\",\r\n  \"telefono\": \"934567890\",\r\n  \"email\": \"contacto@ruedasfelices.com\",\r\n  \"capacidad\": 20,\r\n  \"rating\": 4.8,\r\n  \"fechaApertura\": \"2019-06-20\",\r\n  \"activa\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/autoescuelas",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Autoescuela Svalero 5\",\r\n  \"direccion\": \"Avenida Diagonal 123\",\r\n  \"ciudad\": \"Zaragoza\",\r\n  \"telefono\": \"934567890\",\r\n  \"email\": \"contacto@ruedasfelices.com\",\r\n  \"capacidad\": 20,\r\n  \"rating\": 4.8,\r\n  \"fechaApertura\": \"2019-06-20\",\r\n  \"activa\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/autoescuelasB",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelasB"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (ok)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Autoescuela Ruedas Felices\",\r\n  \"direccion\": \"Avenida Diagonal 123\",\r\n  \"ciudad\": \"Barcelona\",\r\n  \"telefono\": \"934567890\",\r\n  \"email\": \"contacto@ruedasfelices.com\",\r\n  \"capacidad\": 20,\r\n  \"rating\": 4.8,\r\n  \"fechaApertura\": \"2019-06-20\",\r\n  \"activa\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/autoescuelas/3",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (404)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Autoescuela Svalero 4\",\r\n  \"direccion\": \"Avenida Diagonal 123\",\r\n  \"ciudad\": \"Zaragoza\",\r\n  \"telefono\": \"934567890\",\r\n  \"email\": \"contacto@ruedasfelices.com\",\r\n  \"capacidad\": 20,\r\n  \"rating\": 4.8,\r\n  \"fechaApertura\": \"2019-06-20\",\r\n  \"activa\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/autoescuelas/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (400)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/autoescuelas/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (ok)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/autoescuelas/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/autoescuelas/id (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/autoescuelas/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "autoescuelas",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Coche",
+      "item": [
+        {
+          "name": "/coches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (ok)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches (ok)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matricula\": \"6767RBC\",\r\n  \"marca\": \"Toyota\",\r\n  \"modelo\": \"Corolla\",\r\n  \"tipoCambio\": \"Manual\",\r\n  \"kilometraje\": 45000,\r\n  \"fechaCompra\": \"2012-03-15\",\r\n  \"precioCompra\": 12500.50,\r\n  \"disponible\": true,\r\n  \"autoescuelaId\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/coches",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matricula\": \"6767RBC\",\r\n  \"marca\": \"Toyota\",\r\n  \"modelo\": \"Corolla\",\r\n  \"tipoCambio\": \"Manual\",\r\n  \"kilometraje\": 45000,\r\n  \"fechaCompra\": \"2012-03-15\",\r\n  \"precioCompra\": 12500.50,\r\n  \"disponible\": true,\r\n  \"autoescuelaId\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/cochesB",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "cochesB"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (ok)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matricula\": \"1245DBC\",\r\n  \"marca\": \"Seat\",\r\n  \"modelo\": \"Ibiza\",\r\n  \"tipoCambio\": \"Manual\",\r\n  \"kilometraje\": 52000,\r\n  \"fechaCompra\": \"2012-03-15\",\r\n  \"precioCompra\": 12500.50,\r\n  \"disponible\": true,\r\n  \"autoescuelaId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/coches/3",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (404)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matricula\": \"6767RBC\",\r\n  \"marca\": \"Toyota\",\r\n  \"modelo\": \"Corola\",\r\n  \"tipoCambio\": \"Manual\",\r\n  \"kilometraje\": 45000,\r\n  \"fechaCompra\": \"2012-03-15\",\r\n  \"precioCompra\": 12500.50,\r\n  \"disponible\": true,\r\n  \"autoescuelaId\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/coches/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (400)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/coches/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (ok)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/coches/id (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profesor",
+      "item": [
+        {
+          "name": "/profesores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/profesores",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (ok)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/coches/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "coches",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores (ok)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Santi\",\r\n  \"apellidos\": \"Buenos Dias\",\r\n  \"dni\": \"11111111A\",\r\n  \"telefono\": \"666122456\",\r\n  \"salario\": 3800.00,\r\n  \"fechaContratacion\": \"2022-09-01\",\r\n  \"especialidad\": \"Teorico\",\r\n  \"activo\": true,\r\n  \"autoescuelaId\": [2,3,6]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/profesores",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Santi\",\r\n  \"apellidos\": \"Buenos Dias\",\r\n  \"dni\": \"11111111A\",\r\n  \"telefono\": \"666122456\",\r\n  \"salario\": 3800.00,\r\n  \"fechaContratacion\": \"2022-09-01\",\r\n  \"especialidad\": \"Teorico\",\r\n  \"activo\": true,\r\n  \"autoescuelaId\": [2,3,6]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/profesoresB",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesoresB"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (ok)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Santi\",\r\n  \"apellidos\": \"Faci López\",\r\n  \"dni\": \"12345678A\",\r\n  \"telefono\": \"666123456\",\r\n  \"salario\": 1800.00,\r\n  \"fechaContratacion\": \"2020-09-01\",\r\n  \"especialidad\": \"Teorico\",\r\n  \"activo\": true,\r\n  \"autoescuelaId\": [1]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/profesores/3",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (404)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Santi\",\r\n  \"apellidos\": \"Faci López\",\r\n  \"dni\": \"12345678A\",\r\n  \"telefono\": \"666123456\",\r\n  \"salario\": 1800.00,\r\n  \"fechaContratacion\": \"2020-09-01\",\r\n  \"especialidad\": \"Teorico\",\r\n  \"activo\": true,\r\n  \"autoescuelaId\": [1]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/profesores/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (400)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/profesores/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (ok)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/profesores/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/profesores/id (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/profesores/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profesores",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Matricula",
+      "item": [
+        {
+          "name": "/matriculas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/matriculas",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (ok)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/matriculas/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/matriculas/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas (ok)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"modalidad\": \"Camion\",\r\n    \"tipoMatricula\": \"Intensiva\",\r\n    \"fechaInicio\": \"1999-06-16\",\r\n    \"fechaFinal\": \"2005-04-11\",\r\n    \"precio\": 1300.50,\r\n    \"horasPracticas\": 100,\r\n    \"horasTeoricas\": 100,\r\n    \"completada\": true,\r\n    \"observaciones\": \"Bien\",\r\n    \"autoescuelaId\": 4,\r\n    \"alumnoId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/matriculas",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas (404)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"modalidad\": \"Camion\",\r\n    \"tipoMatricula\": \"Intensiva\",\r\n    \"fechaInicio\": \"1999-06-16\",\r\n    \"fechaFinal\": \"2005-04-11\",\r\n    \"precio\": 1300.50,\r\n    \"horasPracticas\": 100,\r\n    \"horasTeoricas\": 100,\r\n    \"completada\": true,\r\n    \"observaciones\": \"Bien\",\r\n    \"autoescuelaId\": 4,\r\n    \"alumnoId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/matriculasB",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculasB"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (ok)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"modalidad\": \"Coche\",\r\n    \"tipoMatricula\": \"Intensiva\",\r\n    \"fechaInicio\": \"1999-06-16\",\r\n    \"fechaFinal\": \"2005-04-11\",\r\n    \"precio\": 1300.50,\r\n    \"horasPracticas\": 100,\r\n    \"horasTeoricas\": 100,\r\n    \"completada\": false,\r\n    \"observaciones\": \"Bien\",\r\n    \"autoescuelaId\": 3,\r\n    \"alumnoId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/matriculas/3",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (404)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"modalidad\": \"Tractor\",\r\n    \"tipoMatricula\": \"Intensiva\",\r\n    \"fechaInicio\": \"1999-06-16\",\r\n    \"fechaFinal\": \"2005-04-11\",\r\n    \"precio\": 1300.50,\r\n    \"horasPracticas\": 100,\r\n    \"horasTeoricas\": 100,\r\n    \"completada\": true,\r\n    \"observaciones\": \"Bien\",\r\n    \"autoescuelaId\": 4,\r\n    \"alumnoId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/matriculas/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (400)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/matriculas/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (ok)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/matriculas/4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/matriculas/id (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/matriculas/6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matriculas",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
